@@ -7,7 +7,7 @@ import pandas as pd
 from PIL import Image
 import glob
 import numpy as np
-from skimage.transform import downscale_local_mean
+from skimage.transform import resize
 from imutils import paths
 import argparse
 
@@ -73,9 +73,9 @@ def combine_into_image(arr, x, y):
     return image
 
 
-def downscale_image(image, row, column):
-    downscaled = downscale_local_mean(image, (row, column))
-    return downscaled
+def resize_image(image, shape):
+    resized = resize(image, shape)
+    return resized
 
 
 def save2csv(images, patterns, path, feature=''):
