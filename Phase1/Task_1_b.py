@@ -7,7 +7,7 @@ import progressbar
 from time import sleep
 import numpy
 
-lbp = LocalBinaryPatterns(100, 1)
+lbp = LocalBinaryPatterns(8, 2)
 folder = os.path.join(Path(os.path.dirname(__file__)).parent, "data/Hands")
 files_in_directory = misc.get_images_in_directory(folder)
 
@@ -29,7 +29,10 @@ for file, path in tqdm(files_in_directory.items()):
         for window in windows:
             lbp_pattern = lbp.computeLBP(window)
             # print(lbp_pattern)
-            result.append(lbp_pattern)
+            if len(result) == 0:
+                result = lbp_pattern
+            else:
+                result += lbp_pattern
 
         # print('Result shape', len(result), len(result[0]))
         dict_file_pattern[file] = result
