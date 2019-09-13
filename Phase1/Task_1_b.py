@@ -1,4 +1,4 @@
-from Phase1.LBP import LocalBinaryPatterns
+from LBP import LocalBinaryPatterns
 from pathlib import Path
 import misc
 import os
@@ -42,6 +42,6 @@ for file, path in tqdm(files_in_directory.items()):
 
 # bar.finish()
 print(len(list(files_in_directory.keys())), len(lbp_patterns))
-misc.save2csv(list(files_in_directory.keys()), lbp_patterns, os.path.dirname(__file__), feature='LBP')
-
+# misc.save2csv(zip(list(files_in_directory.keys()), lbp_patterns), os.path.dirname(__file__), feature='LBP')
+misc.save2pickle(zip(list(files_in_directory.keys()), lbp_patterns), os.path.dirname(__file__), feature='LBP')
 

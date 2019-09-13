@@ -8,6 +8,7 @@ from PIL import Image
 import glob
 import numpy as np
 from skimage.transform import resize
+import pickle
 from imutils import paths
 import argparse
 
@@ -78,7 +79,14 @@ def resize_image(image, shape):
     return resized
 
 
-def save2csv(images, patterns, path, feature=''):
+def save2csv(tuples, path, feature=''):
     path = os.path.join(path, 'LBP.csv')
-    output = pd.DataFrame({'Image ID': images, 'LBP': patterns})
+    output = pd.DataFrame(tuples, columns=['Image ID', feature])
     output.to_csv(path, index=False)
+
+
+def save2pickle(tuples, path, feature):
+    filename = os.path.join(path, feature)
+    outfile = open(filename, 'wb')
+    pickle.dump(tuples, outfile, protocol=2)
+    outfile.close()
