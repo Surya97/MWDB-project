@@ -4,6 +4,7 @@ import os
 from tqdm import tqdm
 import LBP
 import HOG
+import sys
 
 '''
 A utility function to print the array in a more elegant manner
@@ -49,6 +50,12 @@ class FeaturesImages:
             self.model = HOG.Hog(orientations=9, pixels_per_cell=(8, 8), cells_per_block=(2, 2))
 
     '''
+    A getter function to get the initialised feature extraction model.
+    '''
+    def get_model(self):
+        return self.model
+
+    '''
     For the folder path specified, the below function computes the feature vectors
     and stores them in a pickle file based on the respective feature extraction model using
     a helper function 'compute_image_features'. Use of the package 'tqdm' shows a 
@@ -64,7 +71,7 @@ class FeaturesImages:
             features_image_folder = []
             for file, path in tqdm(files_in_directory.items()):
                 image_feature = self.compute_image_features(path, print_arr=False)
-                print(path, len(image_feature))
+                # print(path, len(image_feature))
                 features_image_folder.append(image_feature)
             print(len(list(files_in_directory.keys())), len(features_image_folder))
             images = list(files_in_directory.keys())
@@ -81,10 +88,12 @@ class FeaturesImages:
     '''
 
     def compute_image_features(self, image, print_arr=False):
+        image_feature = []
         try:
+            print('Image path', os.path.join(os.path.dirname(__file__), image))
+            image_path = os.path.join(os.path.dirname(__file__), image)
             image = misc.read_image(os.path.join(os.path.dirname(__file__), image))
             image_gray = misc.convert2gray(image)
-            image_feature = []
             if self.model_name == 'HOG':
                 image_gray = misc.resize_image(image_gray, (120, 160))
             if self.split_windows:
@@ -98,7 +107,8 @@ class FeaturesImages:
             else:
                 image_feature = self.model.compute(image_gray)
         except OSError as e:
-            print(e.strerror)
+            print("Features_image", e.strerror)
+            sys.exit()
         finally:
             if not print_arr:
                 return image_feature
