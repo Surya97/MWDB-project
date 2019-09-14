@@ -9,6 +9,8 @@ model = arguments[1]
 
 if task == '1':
     image_id = arguments[2]
+    features_image = FeaturesImages(model)
+    features_image.compute_image_features(image_id, print_arr=True)
 
 elif task == '2':
     folder_path = arguments[2]

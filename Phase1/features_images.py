@@ -11,8 +11,22 @@ A utility function to print the array in a more elegant manner
 
 
 def print_array(feature_vector):
-    print('\n'.join([''.join(['{:4}'.format(item) for item in row])
-                     for row in feature_vector]))
+    print(len(feature_vector))
+    rows = len(feature_vector) // 10
+    count = 0
+    j = 0
+    for i in range(rows):
+        count = 0
+        while j < len(feature_vector):
+            if count >= 10:
+                break
+            print(feature_vector[j], end=", ")
+            count += 1
+            j += 1
+        print()
+    while j < len(feature_vector):
+        print(feature_vector[j], end=", ")
+        j += 1
 
 
 '''
@@ -23,7 +37,7 @@ Class for handling all the feature vector generation for both single and multipl
 class FeaturesImages:
 
     # Initialize the class variables model name, folder path and model
-    def __init__(self, model_name, folder_path):
+    def __init__(self, model_name, folder_path=None):
         self.model_name = model_name
         self.folder_path = folder_path
         self.split_windows = False
@@ -50,6 +64,7 @@ class FeaturesImages:
             features_image_folder = []
             for file, path in tqdm(files_in_directory.items()):
                 image_feature = self.compute_image_features(path, print_arr=False)
+                print(path, len(image_feature))
                 features_image_folder.append(image_feature)
             print(len(list(files_in_directory.keys())), len(features_image_folder))
             images = list(files_in_directory.keys())
@@ -70,6 +85,8 @@ class FeaturesImages:
             image = misc.read_image(os.path.join(os.path.dirname(__file__), image))
             image_gray = misc.convert2gray(image)
             image_feature = []
+            if self.model_name == 'HOG':
+                image_gray = misc.resize_image(image_gray, (120, 160))
             if self.split_windows:
                 windows = misc.split_into_windows(image_gray, 100, 100)
                 for window in windows:
@@ -79,7 +96,7 @@ class FeaturesImages:
                     else:
                         image_feature += window_pattern
             else:
-                image_feature = self.model.compute(image)
+                image_feature = self.model.compute(image_gray)
         except OSError as e:
             print(e.strerror)
         finally:
