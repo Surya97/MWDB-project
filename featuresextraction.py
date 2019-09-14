@@ -10,7 +10,6 @@ def getcolormoments(image_list):
     for img_bgr in image_list:
         img_yuv = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2YUV)
         windows = my_utils.getwindows(img_yuv)
-        print(len(windows))
         winds_mom_val_y = []
         winds_mom_val_u = []
         winds_mom_val_v = []
@@ -26,7 +25,7 @@ def getcolormoments(image_list):
         img_mom_val = winds_mom_val_y + winds_mom_val_u + winds_mom_val_v
 
         imgsdescriptorlistCMOM.append(img_mom_val)
-
+    print(len(imgsdescriptorlistCMOM[0]))
     return imgsdescriptorlistCMOM
 
 
@@ -49,8 +48,7 @@ def getsift(image_list):
 
             image_final_vector.append(keypointVector)
             keypointVector = []
-        img = cv2.drawKeypoints(img_grey, keypoints)
-        cv2.imwrite('sift_keypoints.jpg', img)
+
         imgsvectorslistSIFT.append(image_final_vector)
 
     return imgsvectorslistSIFT

@@ -5,6 +5,8 @@ from scipy.stats import skew
 import cv2
 import os
 import pandas as pand
+import matplotlib.pyplot as matpyplot
+import matplotlib.image as mpimg
 
 def getImagesName(directory):
     image_names=[]
@@ -26,12 +28,10 @@ def getwindows(img):
     rows = img.shape[0]
     columns = img.shape[1]
 
-    flag = 1
     for i in range(0, rows, 100):
         for j in range(0, columns, 100):
             windows.append(img[i:i + 100, j:j + 100])
-        if flag == 0:
-            break
+
     return windows
 
 
@@ -66,10 +66,21 @@ def save2pickle(tuples, path, feature):
         pickle.dump(tuples, outfile, protocol=2)
         outfile.close()
 
-def load_from_pickle(path, feature):
+def load_from_picklefile(path, feature):
     final_path = os.path.join(path, feature+'.pkl')
     print('pickle file path', final_path)
     infile = open(final_path, 'rb')
     dataset_features = pickle.load(infile)
 
     return dataset_features
+
+def plot_similar_images(filename, similarity):
+
+    image = mpimg.imread(os.path.join('test1/', filename))
+    fig = matpyplot.figure()
+
+    matpyplot.imshow(image, cmap='Greys_r')
+    # plt.axis('off')
+    similarity_string = 'Similarity: ' + str(round(similarity, 2))
+    fig.text(x=0.5, y=0.1, s=similarity_string, verticalalignment='bottom', horizontalalignment='center')
+    matpyplot.show()
