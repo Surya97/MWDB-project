@@ -9,8 +9,10 @@ import glob
 import numpy as np
 from skimage.transform import resize
 import pickle
+from pathlib import Path
 from imutils import paths
 import argparse
+from matplotlib.offsetbox import AnchoredText
 
 
 def get_images_in_directory(path):
@@ -86,7 +88,27 @@ def save2csv(tuples, path, feature=''):
 
 
 def save2pickle(tuples, path, feature):
-    filename = os.path.join(path, feature)
+    filename = os.path.join(path, feature+'.pkl')
     outfile = open(filename, 'wb')
     pickle.dump(tuples, outfile, protocol=2)
     outfile.close()
+
+
+def load_from_pickle(path, feature):
+    final_path = os.path.join(path, feature+'.pkl')
+    print('pickle file path', final_path)
+    infile = open(final_path, 'rb')
+    dataset_features = pickle.load(infile)
+
+    return dataset_features
+
+
+def plot_similar_images(image_id, similarity):
+    image_path = "data/Test dataset/" + image_id
+    image = read_image(image_path)
+    fig = plt.figure()
+    plt.imshow(image, cmap='Greys_r')
+    plt.axis('off')
+    similarity_string = 'Similarity: ' + str(similarity)
+    fig.text(x=0.5, y=0.5, s=similarity_string, verticalalignment='bottom', horizontalalignment='center')
+    plt.show()
