@@ -6,10 +6,13 @@ class LocalBinaryPatterns:
         self.numPoints = numPoints
         self.radius = radius
 
+    def compute(self, image):
+        return self.computeLBP(image)
+
     def computeLBP(self, image, eps=1e-7):
         lbp = feature.local_binary_pattern(image=image, P=self.numPoints, R=self.radius, method='uniform')
         (hist, _) = np.histogram(lbp.ravel(),
-                                 bins=100,
+                                 bins=10,
                                  range=(0.0, 255.0))
 
         hist = hist.astype("float")
