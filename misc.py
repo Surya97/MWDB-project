@@ -103,12 +103,11 @@ def load_from_pickle(path, feature):
     return dataset_features
 
 
-def plot_similar_images(image_id, similarity):
-    image_path = "data/Test dataset/" + image_id
+def plot_similar_images(image_path, similarity):
     image = read_image(image_path)
     fig = plt.figure()
     plt.imshow(image, cmap='Greys_r')
     # plt.axis('off')
-    similarity_string = 'Similarity: ' + str(round(similarity*100, 2))
+    similarity_string = os.path.basename(image_path) + ': Similarity: ' + str(round(similarity*100, 2))
     fig.text(x=0.5, y=0.1, s=similarity_string, verticalalignment='bottom', horizontalalignment='center')
     plt.show()
