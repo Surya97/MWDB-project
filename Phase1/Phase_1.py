@@ -1,5 +1,6 @@
 import sys
 from features_images import FeaturesImages
+from similar_images import Similarity
 
 arguments = sys.argv[1:]
 
@@ -18,5 +19,8 @@ elif task == '2':
     features_folder.compute_features_images_folder()
 if task == '3':
     image_id = arguments[2]
-    k = arguments[3]
+    k = int(arguments[3])
+    test_dataset_path = arguments[4]
+    similarity = Similarity(model, image_id, k)
+    similarity.get_similar_images(test_dataset_path)
 
