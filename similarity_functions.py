@@ -1,7 +1,7 @@
 import cv2
 import my_utils
 import numpy as np
-import colormoments
+
 import math
 import collections
 
@@ -70,4 +70,36 @@ def cmom_similarity(source_img,loaded_imgs, k):
         my_utils.plot_similar_images(image_id, similarity_measure_val)
     return
 
+
+def sift_similarity(source_img,loaded_imgs, k):
+
+    len1 = len(source_img)
+    simiarity_measure_map = {}
+    for image_id, load_img_vec in loaded_imgs.items():
+
+        s_val = my_utils.calc_sift_distance(source_img, load_img_vec)
+        simiarity_measure_map[image_id] = s_val
+
+    sorted_simiarity_measure_map = collections.OrderedDict(sorted(simiarity_measure_map.items(), key=lambda measure_val: measure_val[1]))
+
+    count = 0
+
+    for image_id, similarity_measure_val in sorted_simiarity_measure_map.items():
+        if count == int(k) + 1:
+            break
+        print(similarity_measure_val)
+        count = count + 1
+        my_utils.plot_similar_images(image_id, similarity_measure_val)
+    return
+
+
+def cos_similarity(v1,v2):
+
+    len1=v1.length()
+    len2=v2.length()
+
+
+
+
+    return
 
