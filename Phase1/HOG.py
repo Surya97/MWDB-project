@@ -1,11 +1,16 @@
 from skimage import feature
 import misc
+import os
+import collections
+import numpy as np
 
 
-def compute_similarity(x, y):
-    sum_xy = sum([a * b for a, b in zip(x, y)])
-    sum_square_x = sum([a * a for a in x])
-    sum_square_y = sum([b * b for b in y])
+def cosine_similarity(x, y):
+    mean_x = np.mean(x)
+    mean_y = np.mean(y)
+    sum_xy = sum([(a-mean_x) * (b-mean_y) for a, b in zip(x, y)])
+    sum_square_x = sum([(a-mean_x) * (a-mean_x) for a in x])
+    sum_square_y = sum([(b-mean_y) * (b-mean_y) for b in y])
     cosine_sim = sum_xy / (pow(sum_square_x, 0.5) * pow(sum_square_y, 0.5))
     return cosine_sim
 
@@ -25,4 +30,20 @@ class Hog:
                                     cells_per_block=self.cells_per_block, visualize=True)
         # misc.plot_image(hogImage)
         return H
+
+    def get_similar_images(self, test_image_feature, k, test_folder_path, test_image):
+        misc.plot_image(misc.read_image(os.path.join(test_folder_path, test_image)))
+        dataset_images_features = misc.load_from_pickle(os.path.dirname(__file__), 'HOG')
+        cosine_similarity_ranking = {}
+        for image_id, feature_vector in dataset_images_features.items():
+            similarity = cosine_similarity(test_image_feature, feature_vector)
+            cosine_similarity_ranking[image_id] = similarity
+
+        sorted_hog_results = collections.OrderedDict(sorted(cosine_similarity_ranking.items(),
+                                                            key=lambda val: val[1], reverse=True))
+        top_k_items = {item: sorted_hog_results[item] for item in list(sorted_hog_results)[:k]}
+
+        for image_id in top_k_items.keys():
+            image_path = os.path.join(test_folder_path, image_id)
+            misc.plot_similar_images(image_path, top_k_items[image_id])
 

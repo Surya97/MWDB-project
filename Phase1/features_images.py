@@ -90,7 +90,7 @@ class FeaturesImages:
     def compute_image_features(self, image, print_arr=False):
         image_feature = []
         try:
-            print('Image path', os.path.join(os.path.dirname(__file__), image))
+            # print('Image path', os.path.join(os.path.dirname(__file__), image))
             image_path = os.path.join(os.path.dirname(__file__), image)
             image = misc.read_image(os.path.join(os.path.dirname(__file__), image))
             image_gray = misc.convert2gray(image)
