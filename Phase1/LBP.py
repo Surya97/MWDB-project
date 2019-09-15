@@ -66,9 +66,9 @@ class LocalBinaryPatterns:
         self.radius = radius
 
     def compute(self, image):
-        return self.computeLBP(image)
+        return self.compute_lbp(image)
 
-    def computeLBP(self, image, eps=1e-7):
+    def compute_lbp(self, image, eps=1e-7):
         lbp = feature.local_binary_pattern(image=image, P=self.numPoints, R=self.radius, method='uniform')
         # (hist, _) = np.histogram(lbp.ravel(),
         #                          bins=200,
@@ -82,13 +82,10 @@ class LocalBinaryPatterns:
         return hist.tolist()
 
     def get_similar_images(self, test_image_feature, k, test_folder_path, test_image):
-
-        print(os.path.join(test_folder_path, test_image))
         misc.plot_image(misc.read_image(os.path.join(test_folder_path, test_image)))
         spearman_similarity = SpearmanRanking(test_image_feature)
         dataset_images_features = misc.load_from_pickle(os.path.dirname(__file__), 'LBP')
         ranking = {}
-        print(len(dataset_images_features))
         for image_id, feature_vector in dataset_images_features.items():
             image_feature_rank = spearman_similarity.ranking(feature_vector)
             correlation = spearman_similarity.correlation_coefficient(image_feature_rank)
