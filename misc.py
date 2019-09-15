@@ -4,6 +4,12 @@ import matplotlib.image as mpimg
 
 def getName(imageName):
     image_name = []
+    imgName = imageName.split('/')
+    image_name.append((imgName[len(imgName)-1]))
+    return image_name
+
+def globGetName(imageName):
+    image_name = []
     imgName = imageName.split('\\')
     image_name.append((imgName[len(imgName)-1]))
     return image_name
