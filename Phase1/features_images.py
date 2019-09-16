@@ -73,7 +73,7 @@ class FeaturesImages:
                 image_feature = self.compute_image_features(path, print_arr=False)
                 # print(path, len(image_feature))
                 features_image_folder.append(image_feature)
-            print(len(list(files_in_directory.keys())), len(features_image_folder))
+            # print(len(list(files_in_directory.keys())), len(features_image_folder))
             images = list(files_in_directory.keys())
             folder_images_features_dict = {}
             for i in range(len(images)):

@@ -32,7 +32,7 @@ class Hog:
         return H
 
     def get_similar_images(self, test_image_feature, k, test_folder_path, test_image):
-        misc.plot_image(misc.read_image(os.path.join(test_folder_path, test_image)))
+        # misc.plot_image(misc.read_image(os.path.join(test_folder_path, test_image)))
         dataset_images_features = misc.load_from_pickle(os.path.dirname(__file__), 'HOG')
         cosine_similarity_ranking = {}
         for image_id, feature_vector in dataset_images_features.items():
@@ -43,7 +43,10 @@ class Hog:
                                                             key=lambda val: val[1], reverse=True))
         top_k_items = {item: sorted_hog_results[item] for item in list(sorted_hog_results)[:k]}
 
+        plot_images = {}
         for image_id in top_k_items.keys():
             image_path = os.path.join(test_folder_path, image_id)
-            misc.plot_similar_images(image_path, top_k_items[image_id])
+            plot_images[image_path] = top_k_items[image_id]
+
+        misc.plot_similar_images(plot_images)
 

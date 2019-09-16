@@ -82,7 +82,7 @@ class LocalBinaryPatterns:
         return hist.tolist()
 
     def get_similar_images(self, test_image_feature, k, test_folder_path, test_image):
-        misc.plot_image(misc.read_image(os.path.join(test_folder_path, test_image)))
+        # misc.plot_image(misc.read_image(os.path.join(test_folder_path, test_image)))
         spearman_similarity = SpearmanRanking(test_image_feature)
         dataset_images_features = misc.load_from_pickle(os.path.dirname(__file__), 'LBP')
         ranking = {}
@@ -94,8 +94,11 @@ class LocalBinaryPatterns:
         sorted_results = collections.OrderedDict(sorted(ranking.items(), key=lambda val: val[1], reverse=True))
         top_k_items = {item: sorted_results[item] for item in list(sorted_results)[:k]}
 
+        plot_images = {}
         for image_id in top_k_items.keys():
             image_path = os.path.join(test_folder_path, image_id)
-            misc.plot_similar_images(image_path, top_k_items[image_id])
+            plot_images[image_path] = top_k_items[image_id]
+
+        misc.plot_similar_images(plot_images, top_k_items[image_id])
 
 
