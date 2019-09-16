@@ -53,7 +53,7 @@ Please specify test folder path: <Test Image Folder path>
 * **Task 3:**
 Implement a program which, given an image ID, a model, and a value “k”, returns and visualizes the most
 similar k images based on the corresponding visual descriptors. For each match, also list the overall matching score.
-````
+```
 $ python Phase_1.py
 
 Please specify the task number: 3
