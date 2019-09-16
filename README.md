@@ -4,6 +4,8 @@
 
 ### Phase 1:
 
+**Note:** The CLI for the Phase 1 is inside the folder Phase 1, named Phase_1.py 
+
 * **Task 0:** In this project, we will use the data sets associated with the following publication:
 Mahmoud Afifi. “11K Hands: Gender recognition and biometric identification using a large dataset of hand
 images.” M. Multimed Tools Appl (2019) 78: 20835.
