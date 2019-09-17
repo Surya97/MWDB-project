@@ -41,12 +41,13 @@ class Hog:
 
         sorted_hog_results = collections.OrderedDict(sorted(cosine_similarity_ranking.items(),
                                                             key=lambda val: val[1], reverse=True))
-        top_k_items = {item: sorted_hog_results[item] for item in list(sorted_hog_results)[:k]}
+        top_k_items = {item: sorted_hog_results[item] for item in list(sorted_hog_results)[:k+1]}
 
         plot_images = {}
         for image_id in top_k_items.keys():
-            image_path = os.path.join(test_folder_path, image_id)
-            plot_images[image_path] = top_k_items[image_id]
+            if image_id!=test_image:
+                image_path = os.path.join(test_folder_path, image_id)
+                plot_images[image_path] = top_k_items[image_id]
 
         misc.plot_similar_images(plot_images)
 
