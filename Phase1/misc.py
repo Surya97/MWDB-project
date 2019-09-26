@@ -24,13 +24,11 @@ def get_images_in_directory(path):
     print("Complete path", complete_path)
     files = {}
     for filename in os.listdir(complete_path):
-        # print("File", filename)
         files[filename] = os.path.join(complete_path, filename)
     return files
 
 
 def read_image(image_path, gray=False):
-    # print(os.getcwd())
     dirname = os.path.dirname(__file__)
     image = mpimg.imread(os.path.join(dirname, image_path))
     if gray:
@@ -40,7 +38,6 @@ def read_image(image_path, gray=False):
 
 def convert2gray(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    # plot_image(gray)
     return gray
 
 
@@ -48,45 +45,19 @@ def plot_image(image):
     plt.imshow(image, cmap='Greys_r')
     plt.show()
 
-
-def show_grid(image, x, y):
-    dx = x
-    dy = y
-    grid_color = (255, 0, 0)
-    image_grid = copy.deepcopy(image)
-    image_grid[:, ::dy, :] = grid_color
-    image_grid[::dx, :, :] = grid_color
-    plot_image(image_grid)
-
-
 def split_into_windows(image, x, y):
     w, h = image.shape
-    windows = image.reshape(w//x, x, -1, y)\
-        .swapaxes(1, 2)\
-        .reshape(-1, x, y)
+    windows = []
+    for i in range(0, w, 100):
+        for j in range(0, h, 100):
+            windows.append(image[i:i+100, j:j+100])
 
     return windows
-
-
-def combine_into_image(arr, x, y):
-    arr = np.array(arr)
-    n, rows, cols = arr.shape
-    image = arr.reshape(x//rows, -1, rows, cols)\
-        .swapaxes(1, 2)\
-        .reshape(x, y)
-    print(image)
-    return image
 
 
 def resize_image(image, shape):
     resized = resize(image, shape)
     return resized
-
-
-def save2csv(tuples, path, feature=''):
-    path = os.path.join(path, 'LBP.csv')
-    output = pd.DataFrame(tuples, columns=['Image ID', feature])
-    output.to_csv(path, index=False)
 
 
 def save2pickle(tuples, path, feature):

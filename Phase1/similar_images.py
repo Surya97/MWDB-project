@@ -2,6 +2,9 @@ from features_images import FeaturesImages
 import os
 from pathlib import Path
 
+'''
+Similarity measure base class. Calls the similarity function of the particular model. 
+'''
 
 class Similarity:
     def __init__(self, model_name, test_image_id, k):

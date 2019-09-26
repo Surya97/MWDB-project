@@ -71,9 +71,7 @@ class FeaturesImages:
             features_image_folder = []
             for file, path in tqdm(files_in_directory.items()):
                 image_feature = self.compute_image_features(path, print_arr=False)
-                # print(path, len(image_feature))
                 features_image_folder.append(image_feature)
-            # print(len(list(files_in_directory.keys())), len(features_image_folder))
             images = list(files_in_directory.keys())
             folder_images_features_dict = {}
             for i in range(len(images)):
@@ -90,7 +88,6 @@ class FeaturesImages:
     def compute_image_features(self, image, print_arr=False):
         image_feature = []
         try:
-            # print('Image path', os.path.join(os.path.dirname(__file__), image))
             image_path = os.path.join(os.path.dirname(__file__), image)
             image = misc.read_image(os.path.join(os.path.dirname(__file__), image))
             image_gray = misc.convert2gray(image)
