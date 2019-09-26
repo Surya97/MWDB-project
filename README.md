@@ -16,6 +16,8 @@ Implement a program which, given an image ID and one of the following models, ex
 readable form) the corresponding feature descriptors:<br />
     a\. **Local binary patterns, LBP100x100:** Split the image into 100x100 windows, compute LBP features for each window, and concatenate these to obtain a unified feature descriptor.
 Note that LBP is computed on gray scale images thus, need to first convert the images to gray scale. 
+Similarity measure used is Chi Square Statistic.
+ https://link.springer.com/content/pdf/10.1007%2F978-3-540-24670-1_36.pdf
     ```text
     Parameters used:
     radius: 2
