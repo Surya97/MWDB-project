@@ -13,6 +13,8 @@ def euclidean_distance(feature_list1, feature_list2):
 class ColorMoments:
     def __init__(self):
         self.model_name = 'CM'
+        self.similarity_fn = euclidean_distance
+        self.reverse_sort = False
 
     def get_moments_channel(self, channel):
         moment_mean = sp.mean(channel)
@@ -33,23 +35,6 @@ class ColorMoments:
             combined_feature.append(feature[2])
         return combined_feature
 
-    def get_similar_images(self, test_image_feature, k, test_folder_path, test_image):
-        dataset_images_features = misc.load_from_pickle(os.path.dirname(__file__), 'CM')
-        ranking = {}
-        for image_id, feature_vector in dataset_images_features.items():
-            distance = euclidean_distance(test_image_feature, feature_vector)
-            ranking[image_id] = distance
-
-        sorted_results = collections.OrderedDict(sorted(ranking.items(), key=lambda val: val[1], reverse=False))
-        top_k_items = {item: sorted_results[item] for item in list(sorted_results)[:k+1]}
-
-        plot_images = {}
-        for image_id in top_k_items.keys():
-            if image_id != test_image:
-                image_path = os.path.join(test_folder_path, image_id)
-                plot_images[image_path] = top_k_items[image_id]
-
-        misc.plot_similar_images(plot_images)
 
 
 

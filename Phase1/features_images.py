@@ -5,6 +5,7 @@ from tqdm import tqdm
 import LBP
 import HOG
 import ColorMoments
+import SIFT
 import sys
 
 
@@ -29,6 +30,8 @@ class FeaturesImages:
         elif self.model_name == 'CM':
             self.model = ColorMoments.ColorMoments()
             self.split_windows = True
+        elif self.model_name == 'SIFT':
+            self.model = SIFT.SIFT()
 
     '''
     A getter function to get the initialised feature extraction model.
