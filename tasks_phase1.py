@@ -3,29 +3,25 @@ import cv2
 import my_utils
 import featuresextraction
 import similarity_functions
-# getting all the arguments
-args = sys.argv[1:]
 
-# taskid
-task = args[0]
-
-# modelnumber - which color model to use
-model = args[1]
+args = sys.argv[1:] # getting all the arguments
+task = args[0] # taskid
+model = args[1] # modelnumber - which color model to use
 
 #single image
 if task == '1':
     image_id = args[2]
     # colormoments
-    if model=='cmom':
+    if model == 'cmom':
         images = []
-        images.append(cv2.imread('test/' + image_id, 1))     # reading the image
-        cmomfeatures_vector = featuresextraction.getcolormoments(images)   # extracting the features of the image
+        images.append(cv2.imread('test/' + image_id, 1))  # reading the image
+        cmomfeatures_vector = featuresextraction.getcolormoments(images)  # extracting the features of the image
         print(cmomfeatures_vector)
     # sift
-    elif model=='sift':
+    elif model == 'sift':
         images = []
-        images.append(cv2.imread('test/' + image_id, 1))     #reading the image
-        cmomfeatures_vector = featuresextraction.getsift(images)   #extracting the features of the image
+        images.append(cv2.imread('test/' + image_id, 1))  # reading the image
+        cmomfeatures_vector = featuresextraction.getsift(images)  # extracting the features of the image
         print(cmomfeatures_vector)
 
 
@@ -71,16 +67,17 @@ if task == '3':
 
     images = []
     images.append(source_img)
-
+    #for color moments
     if model == 'cmom':
         source_cmom_vector = featuresextraction.getcolormoments(images)
         directory_cmom_features_map = {}
         directory_cmom_features_map = my_utils.load_from_picklefile('pickleoutput/', 'cmom')  # loading the cmom features from the pickle file
         similarity_functions.cmom_similarity(source_cmom_vector[0], directory_cmom_features_map, k)
-
+    #sift
     elif model == 'sift':
         source_sift_vector = featuresextraction.getsift(images)
         directory_sift_features_map = {}
         directory_sift_features_map = my_utils.load_from_picklefile('pickleoutput/','sift')  # loading the sift vectors from the pickle file
         print(len(source_sift_vector[0]))
         similarity_functions.sift_similarity(source_sift_vector[0], directory_sift_features_map, k)
+
