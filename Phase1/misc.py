@@ -1,20 +1,14 @@
+
+
 import os
-import copy
 import cv2
 import math
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
-import pandas as pd
-from PIL import Image
-import glob
-import numpy as np
 from skimage.transform import resize
 from matplotlib import gridspec
 import pickle
-from pathlib import Path
-from imutils import paths
-import argparse
-from matplotlib.offsetbox import AnchoredText
+
 
 
 def get_images_in_directory(path):
@@ -37,8 +31,13 @@ def read_image(image_path, gray=False):
 
 
 def convert2gray(image):
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
     return gray
+
+
+def convert2yuv(image):
+    yuv_image = cv2.cvtColor(image, cv2.COLOR_RGB2YUV)
+    return yuv_image
 
 
 def plot_image(image):
@@ -46,7 +45,7 @@ def plot_image(image):
     plt.show()
 
 def split_into_windows(image, x, y):
-    w, h = image.shape
+    w, h, depth = image.shape
     windows = []
     for i in range(0, w, 100):
         for j in range(0, h, 100):
@@ -90,7 +89,7 @@ def plot_similar_images(plot_images_dict):
         image = read_image(image_paths[i])
         im = ax.imshow(image, cmap='Greys_r')
         similarity_string = os.path.basename(image_paths[i]) + '\nSimilarity: ' + str(
-                    round(image_similarities[i] * 100, 2))
+                    round(image_similarities[i], 2))
         ax.axis('off')
         ax.text(x=0.5, y=-0.1, s=similarity_string, verticalalignment='bottom', horizontalalignment='center')
     plt.show()
