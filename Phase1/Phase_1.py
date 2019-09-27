@@ -4,7 +4,7 @@ from similar_images import Similarity
 
 
 task = input("Please specify the task number: ")
-model = input("1.CM\n2.LBP\n3.HOG\nSelect model: ")
+model = input("1.CM\n2.LBP\n3.HOG\n4.SIFT\nSelect model: ")
 if task == '1':
     image_id = input("Please specify the test image file name: ")
     features_image = FeaturesImages(model)
