@@ -4,30 +4,8 @@ import os
 from tqdm import tqdm
 import LBP
 import HOG
+import ColorMoments
 import sys
-
-'''
-A utility function to print the array in a more elegant manner
-'''
-
-
-def print_array(feature_vector):
-    print(len(feature_vector))
-    rows = len(feature_vector) // 10
-    count = 0
-    j = 0
-    for i in range(rows):
-        count = 0
-        while j < len(feature_vector):
-            if count >= 10:
-                break
-            print(feature_vector[j], end=", ")
-            count += 1
-            j += 1
-        print()
-    while j < len(feature_vector):
-        print(feature_vector[j], end=", ")
-        j += 1
 
 
 '''
@@ -48,6 +26,9 @@ class FeaturesImages:
             self.split_windows = True
         elif self.model_name == 'HOG':
             self.model = HOG.Hog(orientations=9, pixels_per_cell=(8, 8), cells_per_block=(2, 2))
+        elif self.model_name == 'CM':
+            self.model = ColorMoments.ColorMoments()
+            self.split_windows = True
 
     '''
     A getter function to get the initialised feature extraction model.
@@ -89,20 +70,23 @@ class FeaturesImages:
         image_feature = []
         try:
             image_path = os.path.join(os.path.dirname(__file__), image)
-            image = misc.read_image(os.path.join(os.path.dirname(__file__), image))
-            image_gray = misc.convert2gray(image)
+            image = misc.read_image(image_path)
+            converted_image = misc.convert2gray(image)
+            if self.model_name == 'CM':
+                converted_image = misc.convert2yuv(image)
             if self.model_name == 'HOG':
-                image_gray = misc.resize_image(image_gray, (120, 160))
+                converted_image = misc.resize_image(converted_image, (120, 160))
             if self.split_windows:
-                windows = misc.split_into_windows(image_gray, 100, 100)
+                windows = misc.split_into_windows(converted_image, 100, 100)
                 for window in windows:
                     window_pattern = self.model.compute(window)
                     if len(image_feature) == 0:
                         image_feature = window_pattern
                     else:
                         image_feature += window_pattern
+                # print(len(image_feature))
             else:
-                image_feature = self.model.compute(image_gray)
+                image_feature = self.model.compute(converted_image)
         except OSError as e:
             print("Features_image", e.strerror)
             sys.exit()
@@ -110,4 +94,4 @@ class FeaturesImages:
             if not print_arr:
                 return image_feature
             else:
-                print_array(image_feature)
+                print(image_feature)
