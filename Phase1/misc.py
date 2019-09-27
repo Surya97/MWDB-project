@@ -1,5 +1,3 @@
-
-
 import os
 import cv2
 import math
@@ -8,7 +6,6 @@ import matplotlib.pyplot as plt
 from skimage.transform import resize
 from matplotlib import gridspec
 import pickle
-
 
 
 def get_images_in_directory(path):
@@ -44,8 +41,9 @@ def plot_image(image):
     plt.imshow(image, cmap='Greys_r')
     plt.show()
 
+
 def split_into_windows(image, x, y):
-    w, h, depth = image.shape
+    w, h= image.shape[0], image.shape[1]
     windows = []
     for i in range(0, w, 100):
         for j in range(0, h, 100):
