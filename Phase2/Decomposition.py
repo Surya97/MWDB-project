@@ -9,11 +9,11 @@ from SVD import SVD
 
 
 class Decomposition:
-    def __init__(self, decomposition_name, k_components, feature_extraction_model):
+    def __init__(self, decomposition_name, k_components, feature_extraction_model_name):
         self.decomposition_name = decomposition_name
         self.k_components = k_components
         self.decomposition_model = None
-        self.feature_extraction_model_name = feature_extraction_model
+        self.feature_extraction_model_name = feature_extraction_model_name
         self.feature_extraction_model = FeaturesImages(self.feature_extraction_model_name)
         self.database_matrix = []
         self.set_database_matrix()
