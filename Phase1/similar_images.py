@@ -39,5 +39,4 @@ class Similarity:
                 image_path = os.path.join(test_folder_path, image_id)
                 plot_images[image_path] = top_k_items[image_id]
 
-        print('test')
         misc.plot_similar_images(plot_images)
