@@ -12,8 +12,11 @@ class SVD:
         self.decomposed_database_matrix = None
 
     def decompose(self):
-        self.u, self.s, self.vh = svd(self.database_matrix)
-        self.decomposed_database_matrix = np.dot(self.u, np.diag(self.s[:self.k_components]))
+        self.u, self.s, self.vh = svd(self.database_matrix, full_matrices=False)
+        # print(len(self.u), len(self.u[0]))
+        # print(len(self.s))
+        # print(len(self.vh), len(self.vh[0]))
+        self.decomposed_database_matrix = np.matmul(np.matmul(self.u, np.diag(self.s)), self.vh)
         return self.print_term_weight_pairs()
 
     def get_eigen_vectors(self):
