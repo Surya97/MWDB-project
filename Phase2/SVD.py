@@ -12,11 +12,17 @@ class SVD:
         self.decomposed_database_matrix = None
 
     def decompose(self):
-        self.u, self.s, self.vh = svd(self.database_matrix, full_matrices=False)
+        self.u, self.s, self.vh = svd(self.database_matrix)
         # print(len(self.u), len(self.u[0]))
         # print(len(self.s))
         # print(len(self.vh), len(self.vh[0]))
-        self.decomposed_database_matrix = np.matmul(np.matmul(self.u, np.diag(self.s)), self.vh)
+        # self.decomposed_database_matrix = np.matmul(np.matmul(self.u, np.diag(self.s)), self.vh)
+        print('Original database matrix dimensions', len(self.database_matrix), len(self.database_matrix[0]))
+        for i in range(len(self.u)):
+            print(len(self.u[i]))
+            print(self.u[i])
+            print("-------------------------------------------")
+        self.decomposed_database_matrix = self.u
         print(len(self.decomposed_database_matrix), len(self.decomposed_database_matrix[0]))
         return self.print_term_weight_pairs()
 
@@ -31,7 +37,7 @@ class SVD:
 
     def print_term_weight_pairs(self):
         eigen_vectors = self.get_eigen_vectors()
-        eigen_values = self.get_eigen_values()
+        eigen_values = self.get_feature_weight_values()
         count = 1
         for eigen_value, eigen_vector in zip(eigen_values, eigen_vectors):
             print("Latent feature", count)
