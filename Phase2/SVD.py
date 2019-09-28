@@ -17,6 +17,7 @@ class SVD:
         # print(len(self.s))
         # print(len(self.vh), len(self.vh[0]))
 
+
         self.decomposed_database_matrix = np.matmul(np.matmul(self.u, np.diag(self.s)), self.vh)
         #print(len(self.decomposed_database_matrix), len(self.decomposed_database_matrix[0]))
         return self.print_term_weight_pairs()
