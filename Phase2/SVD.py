@@ -26,6 +26,9 @@ class SVD:
     def get_feature_weight_values(self):
         return self.s[:self.k_components]
 
+    def get_decomposed_data_matrix(self):
+        return self.decomposed_database_matrix
+
     def print_term_weight_pairs(self):
         eigen_vectors = self.get_eigen_vectors()
         eigen_values = self.get_eigen_values()

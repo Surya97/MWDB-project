@@ -25,14 +25,17 @@ class PCAModel:
         self.decomposed_database_matrix = self.principal_components
         return self.print_term_weight_pairs()
 
-    def get_eigen_values(self):
+    def get_feature_weight_values(self):
         return self.pca.explained_variance_
 
     def get_eigen_vectors(self):
         return np.array(self.principal_components).transpose()
 
+    def get_decomposed_data_matrix(self):
+        return self.decomposed_database_matrix
+
     def print_term_weight_pairs(self):
-        eigen_values = self.get_eigen_values()
+        eigen_values = self.get_feature_weight_values()
         eigen_vectors = self.get_eigen_vectors()
         count = 1
         for eigen_value, eigen_vector in zip(eigen_values, eigen_vectors):
@@ -41,6 +44,9 @@ class PCAModel:
             print("Eigen Vector:", eigen_vector)
             print()
             count += 1
+
+    def get_data_latent_semantics(self):
+        return self.decomposed_database_matrix
 
 
 
