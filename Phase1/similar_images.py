@@ -17,13 +17,11 @@ class Similarity:
         self.test_image_id = test_image_id
         self.k = k
 
-    def get_similar_images(self, test_folder):
-        features_images = FeaturesImages(self.model_name)
+    def get_similar_images(self, test_folder=None, reduced_dimension=False):
+        test_image_features, dataset_images_features = self.get_database_image_features(test_folder, reduced_dimension)
         test_folder_path = os.path.join(Path(os.path.dirname(__file__)).parent, test_folder)
-        test_image_path = os.path.join(test_folder_path, self.test_image_id)
-        test_image_features = features_images.compute_image_features(test_image_path)
+        features_images = FeaturesImages(self.model_name)
         model = features_images.get_model()
-        dataset_images_features = misc.load_from_pickle(os.path.dirname(__file__), self.model_name)
         ranking = {}
         for image_id, feature_vector in tqdm(dataset_images_features.items()):
             distance = model.similarity_fn(test_image_features, feature_vector)
@@ -40,3 +38,26 @@ class Similarity:
                 plot_images[image_path] = top_k_items[image_id]
 
         misc.plot_similar_images(plot_images)
+
+    def get_database_image_features(self, test_folder=None, reduced_dimension=False):
+        if not reduced_dimension:
+            path = os.path.dirname(__file__)
+            feature = self.model_name
+            if os.path.exists(os.path.join(path, feature+'.pkl')):
+                features_images = FeaturesImages(self.model_name)
+                test_folder_path = os.path.join(Path(os.path.dirname(__file__)).parent, test_folder)
+                test_image_path = os.path.join(test_folder_path, self.test_image_id)
+                test_image_features = features_images.compute_image_features(test_image_path)
+                dataset_images_features = misc.load_from_pickle(os.path.dirname(__file__), self.model_name)
+                return test_image_features, dataset_images_features
+
+        else:
+            reduced_dimension_pickle_path = os.path.join(Path(os.path.dirname(__file__)).parent,
+                                                         'Phase2', 'pickle_files')
+            dataset_images_features = misc.load_from_pickle(reduced_dimension_pickle_path, self.model_name)
+            test_image_features = dataset_images_features[self.test_image_id]
+            return test_image_features, dataset_images_features
+
+
+
+
