@@ -40,7 +40,7 @@ class Decomposition:
                 self.decomposition_model = NMFModel(self.database_matrix, self.k_components)
         elif self.decomposition_name == 'LDA':
             if self.feature_extraction_model_name=='CM':
-                print('CM is not feasible for NMF Decomposition')
+                print('CM is not feasible for LDA Decomposition')
             else:
                 self.decomposition_model = LDAModel(self.database_matrix, self.k_components)
 
