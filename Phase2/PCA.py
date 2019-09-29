@@ -22,6 +22,7 @@ class PCAModel:
     def decompose(self):
         scaled_feature_matrix = StandardScaler().fit_transform(self.database_matrix)
         self.principal_components = self.pca.fit_transform(scaled_feature_matrix)
+        # print(len(self.principal_components), len(self.principal_components[0]))
         self.decomposed_database_matrix = self.principal_components
         return self.print_term_weight_pairs()
 

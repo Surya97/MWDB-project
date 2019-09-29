@@ -9,21 +9,12 @@ class SVD:
         self.u = None
         self.vh = None
         self.s = None
-        self.decomposed_database_matrix = None
+        self.reduced_database_matrix = None
 
     def decompose(self):
-        self.u, self.s, self.vh = svd(self.database_matrix)
-        # print(len(self.u), len(self.u[0]))
-        # print(len(self.s))
-        # print(len(self.vh), len(self.vh[0]))
-        # self.decomposed_database_matrix = np.matmul(np.matmul(self.u, np.diag(self.s)), self.vh)
-        print('Original database matrix dimensions', len(self.database_matrix), len(self.database_matrix[0]))
-        for i in range(len(self.u)):
-            print(len(self.u[i]))
-            print(self.u[i])
-            print("-------------------------------------------")
-        self.decomposed_database_matrix = self.u
-        print(len(self.decomposed_database_matrix), len(self.decomposed_database_matrix[0]))
+        self.u, self.s, self.vh = svd(self.database_matrix, full_matrices=False)
+        # print('Original database matrix dimensions', len(self.database_matrix), len(self.database_matrix[0]))
+        self.get_decomposed_data_matrix()
         return self.print_term_weight_pairs()
 
     def get_eigen_vectors(self):
@@ -33,7 +24,11 @@ class SVD:
         return self.s[:self.k_components]
 
     def get_decomposed_data_matrix(self):
-        return self.decomposed_database_matrix
+        self.reduced_database_matrix = np.dot(self.u[:, :self.k_components], np.diag(self.s[:self.k_components]))
+        # print(len(self.reduced_database_matrix), len(self.reduced_database_matrix[0]))
+        # for i in range(len(self.reduced_database_matrix)):
+        #     print(self.reduced_database_matrix[i])
+        return self.reduced_database_matrix
 
     def print_term_weight_pairs(self):
         eigen_vectors = self.get_eigen_vectors()
