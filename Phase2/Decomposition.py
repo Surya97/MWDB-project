@@ -40,16 +40,15 @@ class Decomposition:
         elif self.decomposition_name == 'SVD':
             self.decomposition_model = SVD(self.database_matrix, self.k_components)
         elif self.decomposition_name == 'NMF':
-            if self.feature_extraction_model_name=='CM':
-                print('CM is not feasible for NMF Decomposition')
+            if self.feature_extraction_model_name == 'CM':
+                raise Exception('CM is not feasible for NMF Decomposition')
             else:
                 self.decomposition_model = NMFModel(self.database_matrix, self.k_components)
         elif self.decomposition_name == 'LDA':
-            if self.feature_extraction_model_name=='CM':
-                print('CM is not feasible for LDA Decomposition')
+            if self.feature_extraction_model_name == 'CM':
+                raise Exception('CM is not feasible for LDA Decomposition')
             else:
                 self.decomposition_model = LDAModel(self.database_matrix, self.k_components)
-
 
         self.decomposition_model.decompose()
         decomposed_database_matrix = self.decomposition_model.get_decomposed_data_matrix()
