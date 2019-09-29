@@ -51,6 +51,7 @@ class Decomposition:
                 self.decomposition_model = LDAModel(self.database_matrix, self.k_components)
 
         self.decomposition_model.decompose()
+        print('Decomposition Complete')
         decomposed_database_matrix = self.decomposition_model.get_decomposed_data_matrix()
         reduced_dimension_folder_images_dict = {}
         for image_id, reduced_feature_vector in zip(self.database_image_id, decomposed_database_matrix):

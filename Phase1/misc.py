@@ -59,6 +59,7 @@ def resize_image(image, shape):
 
 def save2pickle(tuples, path, feature):
     filename = os.path.join(path, feature+'.pkl')
+    print('saving to pickle file path', filename)
     outfile = open(filename, 'wb')
     pickle.dump(tuples, outfile, protocol=2)
     outfile.close()
@@ -66,7 +67,7 @@ def save2pickle(tuples, path, feature):
 
 def load_from_pickle(path, feature):
     final_path = os.path.join(path, feature+'.pkl')
-    print('pickle file path', final_path)
+    print('loading from pickle file path', final_path)
     infile = open(final_path, 'rb')
     dataset_features = pickle.load(infile)
 
