@@ -1,6 +1,10 @@
 from numpy.linalg import svd
 import numpy as np
 
+'''
+Base Class for SVD
+'''
+
 
 class SVD:
     def __init__(self, database_matrix, k_components):

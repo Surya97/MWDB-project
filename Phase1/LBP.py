@@ -19,7 +19,7 @@ class LocalBinaryPatterns:
     def __init__(self, numPoints, radius):
         self.numPoints = numPoints
         self.radius = radius
-        self.similarity_fn = chisquare
+        self.similarity_fn = euclidean_distance
         self.reverse_sort = False
 
     def compute(self, image):
