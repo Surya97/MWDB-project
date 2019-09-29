@@ -9,12 +9,14 @@ from SVD import SVD
 
 
 class Decomposition:
-    def __init__(self, decomposition_name, k_components, feature_extraction_model_name):
+    def __init__(self, decomposition_name, k_components, feature_extraction_model_name, test_folder_path):
         self.decomposition_name = decomposition_name
         self.k_components = k_components
         self.decomposition_model = None
         self.feature_extraction_model_name = feature_extraction_model_name
-        self.feature_extraction_model = FeaturesImages(self.feature_extraction_model_name)
+        self.test_folder_path = test_folder_path
+        self.feature_extraction_object = FeaturesImages(self.feature_extraction_model_name, self.test_folder_path)
+        self.feature_extraction_model = self.feature_extraction_object.get_model()
         self.database_matrix = []
         self.set_database_matrix()
 
@@ -22,6 +24,7 @@ class Decomposition:
         parent_directory_path = Path(os.path.dirname(__file__)).parent
         pickle_file_directory = os.path.join(parent_directory_path, 'Phase1')
         print('pickle file directory', pickle_file_directory)
+        self.feature_extraction_object.compute_features_images_folder()
         database_images_features = misc.load_from_pickle(pickle_file_directory, self.feature_extraction_model_name)
         for image_id, feature_vector in database_images_features.items():
             self.database_matrix.append(feature_vector)
