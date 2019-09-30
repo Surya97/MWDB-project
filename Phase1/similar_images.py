@@ -16,9 +16,9 @@ class Similarity:
         self.model_name = model_name
         self.test_image_id = test_image_id
         self.k = k
-        self.decomposition = decomposition
 
-    def get_similar_images(self, test_folder=None, reduced_dimension=False):
+
+    def get_similar_images(self, test_folder=None, decomposition=None, reduced_dimension=False):
         test_folder_path = os.path.join(Path(os.path.dirname(__file__)).parent, test_folder)
         test_image_path = os.path.join(test_folder_path, self.test_image_id)
         try:
@@ -28,7 +28,7 @@ class Similarity:
             print('ImageId is not in the folder specified.')
             return
 
-        test_image_features, dataset_images_features = self.get_database_image_features(test_folder, reduced_dimension)
+        test_image_features, dataset_images_features = self.get_database_image_features(test_folder, decomposition, reduced_dimension)
         test_folder_path = os.path.join(Path(os.path.dirname(__file__)).parent, test_folder)
         features_images = FeaturesImages(self.model_name)
         model = features_images.get_model()
@@ -49,7 +49,7 @@ class Similarity:
         print('Plotting Similar Images')
         misc.plot_similar_images(plot_images)
 
-    def get_database_image_features(self, test_folder=None, reduced_dimension=False):
+    def get_database_image_features(self, test_folder=None, decomposition=None , reduced_dimension=False ):
 
         test_folder_path = os.path.join(Path(os.path.dirname(__file__)).parent, test_folder)
         test_image_path = os.path.join(test_folder_path, self.test_image_id)
@@ -64,18 +64,19 @@ class Similarity:
             features_images.compute_features_images_folder()
 
             test_image_features = features_images.compute_image_features(test_image_path)
-            dataset_images_features = misc.load_from_pickle(os.path.dirname(__file__), feature, self.k)
+            dataset_images_features = misc.load_from_pickle(os.path.dirname(__file__),feature)
             return test_image_features, dataset_images_features
 
         else:
             feature = self.model_name
             reduced_dimension_pickle_path = os.path.join(Path(os.path.dirname(__file__)).parent,
                                                          'Phase2', 'pickle_files')
-            #if not(os.path.exists(os.path.join(reduced_dimension_pickle_path, feature+'.pkl'))):
-            decomposition = self.decomposition
-            decomposition.dimensionality_reduction()
-            
-            dataset_images_features = misc.load_from_pickle(reduced_dimension_pickle_path,feature, self.k)
+            if not(os.path.exists(os.path.join(reduced_dimension_pickle_path, feature+decomposition.decomposition_name+'.pkl'))):
+                print('Pickle file not found for the Particular (model,Reduction)')
+                print('Runnning Task1 for the Particular (model,Reduction) to get the pickle file')
+                decomposition.dimensionality_reduction()
+
+            dataset_images_features = misc.load_from_pickle(reduced_dimension_pickle_path,feature+decomposition.decomposition_name, self.k)
             test_image_features = dataset_images_features[self.test_image_id]
             return test_image_features, dataset_images_features
 

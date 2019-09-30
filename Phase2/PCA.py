@@ -24,7 +24,7 @@ class PCAModel:
         self.principal_components = self.pca.fit_transform(scaled_feature_matrix)
         # print(len(self.principal_components), len(self.principal_components[0]))
         self.decomposed_database_matrix = self.principal_components
-        return self.print_term_weight_pairs()
+        return
 
     def get_feature_weight_values(self):
         return self.pca.explained_variance_
@@ -35,16 +35,19 @@ class PCAModel:
     def get_decomposed_data_matrix(self):
         return self.decomposed_database_matrix
 
-    def print_term_weight_pairs(self):
+    def print_term_weight_pairs(self,k=-1):
         eigen_values = self.get_feature_weight_values()
         eigen_vectors = self.get_eigen_vectors()
         count = 1
         for eigen_value, eigen_vector in zip(eigen_values, eigen_vectors):
+            if count>k:
+                return
             print("Latent feature", count)
             print("Eigen Value:", eigen_value)
             print("Eigen Vector:", eigen_vector)
             print()
             count += 1
+
 
     def get_data_latent_semantics(self):
         return self.decomposed_database_matrix

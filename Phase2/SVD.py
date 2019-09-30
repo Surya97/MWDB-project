@@ -19,7 +19,7 @@ class SVD:
         self.u, self.s, self.vh = svd(self.database_matrix, full_matrices=False)
         # print('Original database matrix dimensions', len(self.database_matrix), len(self.database_matrix[0]))
         self.get_decomposed_data_matrix()
-        return self.print_term_weight_pairs()
+        return
 
     def get_eigen_vectors(self):
         return self.vh[:self.k_components]
@@ -34,16 +34,19 @@ class SVD:
         #     print(self.reduced_database_matrix[i])
         return self.reduced_database_matrix
 
-    def print_term_weight_pairs(self):
+    def print_term_weight_pairs(self,k=-1):
         eigen_vectors = self.get_eigen_vectors()
         eigen_values = self.get_feature_weight_values()
         count = 1
         for eigen_value, eigen_vector in zip(eigen_values, eigen_vectors):
+            if count > k:
+                return
             print("Latent feature", count)
             print("Eigen Value:", eigen_value)
             print("Eigen Vector:", eigen_vector)
             print()
             count += 1
+
 
 
 

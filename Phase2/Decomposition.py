@@ -22,12 +22,12 @@ class Decomposition:
         self.database_matrix = []
         self.database_image_id = []
         self.reduced_pickle_file_folder = os.path.join(os.path.dirname(__file__), 'pickle_files')
-        self.set_database_matrix()
 
     def set_database_matrix(self):
         parent_directory_path = Path(os.path.dirname(__file__)).parent
         pickle_file_directory = os.path.join(parent_directory_path, 'Phase1')
-        print('pickle file directory', pickle_file_directory)
+        #print('pickle file directory', pickle_file_directory)
+        print('Getting the Model Features from Phase1')
         self.feature_extraction_object.compute_features_images_folder()
         database_images_features = misc.load_from_pickle(pickle_file_directory, self.feature_extraction_model_name)
         for image_id, feature_vector in database_images_features.items():
@@ -35,6 +35,12 @@ class Decomposition:
             self.database_image_id.append(image_id)
 
     def dimensionality_reduction(self):
+        self.set_database_matrix()
+        # Note : when we have number of images <=20 or features <=20 , we are getting an error
+        # this is because the database_matrix has <=20 images and the reduction models, should have n_components parameters <= n,m
+        # Hence, we have to take the min(min(len(self.database_matrix[0]),len(self.database_matrix)),20)
+        self.k_components = min(min(len(self.database_matrix[0]),len(self.database_matrix)),self.k_components)
+
         if self.decomposition_name == 'PCA':
             self.decomposition_model = PCAModel(self.database_matrix, self.k_components)
         elif self.decomposition_name == 'SVD':
@@ -58,6 +64,6 @@ class Decomposition:
             reduced_dimension_folder_images_dict[image_id] = reduced_feature_vector
 
         misc.save2pickle(reduced_dimension_folder_images_dict, self.reduced_pickle_file_folder,
-                         feature=self.feature_extraction_model_name)
+                         feature=(self.feature_extraction_model_name+self.decomposition_name))
 
 

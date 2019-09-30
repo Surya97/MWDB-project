@@ -14,7 +14,7 @@ def get_images_in_directory(path):
     dirname = os.path.dirname(__file__)
     print(dirname)
     complete_path = os.path.join(dirname, path)
-    print("Complete path", complete_path)
+    #print("Complete path", complete_path)
     files = {}
     for filename in os.listdir(complete_path):
         files[filename] = os.path.join(complete_path, filename)
@@ -75,7 +75,6 @@ def load_from_pickle(path, feature,k=-1):
     if k!=-1:
         for image_id, feature_vector in dataset_features.items():
             dataset_features[image_id]=feature_vector[:k]
-    
     return dataset_features
 
 
