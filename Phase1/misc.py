@@ -1,4 +1,6 @@
 import os
+from itertools import product
+
 import cv2
 import math
 import matplotlib.image as mpimg
@@ -65,12 +67,15 @@ def save2pickle(tuples, path, feature):
     outfile.close()
 
 
-def load_from_pickle(path, feature):
+def load_from_pickle(path, feature,k=-1):
     final_path = os.path.join(path, feature+'.pkl')
     print('loading from pickle file path', final_path)
     infile = open(final_path, 'rb')
     dataset_features = pickle.load(infile)
-
+    if k!=-1:
+        for image_id, feature_vector in dataset_features.items():
+            dataset_features[image_id]=feature_vector[:k]
+    
     return dataset_features
 
 

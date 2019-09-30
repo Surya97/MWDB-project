@@ -64,7 +64,7 @@ class Similarity:
             features_images.compute_features_images_folder()
 
             test_image_features = features_images.compute_image_features(test_image_path)
-            dataset_images_features = misc.load_from_pickle(os.path.dirname(__file__), feature)
+            dataset_images_features = misc.load_from_pickle(os.path.dirname(__file__), feature, self.k)
             return test_image_features, dataset_images_features
 
         else:
@@ -74,8 +74,8 @@ class Similarity:
             #if not(os.path.exists(os.path.join(reduced_dimension_pickle_path, feature+'.pkl'))):
             decomposition = self.decomposition
             decomposition.dimensionality_reduction()
-
-            dataset_images_features = misc.load_from_pickle(reduced_dimension_pickle_path,feature)
+            
+            dataset_images_features = misc.load_from_pickle(reduced_dimension_pickle_path,feature, self.k)
             test_image_features = dataset_images_features[self.test_image_id]
             return test_image_features, dataset_images_features
 
