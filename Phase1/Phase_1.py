@@ -1,7 +1,7 @@
 import sys
 from features_images import FeaturesImages
 from similar_images import Similarity
-
+from DimRed import DimRed
 
 task = input("Please specify the task number: ")
 model = input("1.CM\n2.LBP\n3.HOG\n4.SIFT\nSelect model: ")
@@ -21,3 +21,11 @@ elif task == '3':
     test_dataset_path = input("Please specify test folder path: ")
     similarity = Similarity(model, image_id, k)
     similarity.get_similar_images(test_dataset_path)
+    
+elif task == '21':
+    folder_path = input("Please specify test folder path: ")
+    dmModel = input("1.PCA\n2.SVD\n3.NMF\n4.LDA\nSelect model: ")
+    k = int(input("Please specify the value of K: "))
+    dimRed = DimRed(model, dmModel, k)
+    dimRed.get_dimensionality_reduction(folder_path)
+    
