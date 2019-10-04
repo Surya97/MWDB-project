@@ -34,7 +34,7 @@ elif task == '3':
     metadata = Metadata(images_list)
     label = int(input("1.Left-Hand\n2.Right-Hand\n3.Dorsal\n4.Palmar\n"
                       "5.With accessories\n6.Without accessories\n7.Male\n8.Female\n"
-                      "Please choose an option"))
+                      "Please choose an option: "))
     label_interpret_dict = {
         1: {"aspectOfHand": "left"},
         2: {"aspectOfHand": "right"},
