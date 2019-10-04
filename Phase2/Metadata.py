@@ -32,17 +32,16 @@ class Metadata:
 
         if feature_dict is not None:
             aspect_of_hand = ''
-            if feature_dict.get('left_or_right'):
-                aspect_of_hand += feature_dict.get('left_or_right')
-            if feature_dict.get('dorsal_or_palmer'):
-                aspect_of_hand += feature_dict.get('dorsal_or_palmer')
+            if feature_dict.get('aspectOfHand'):
+                aspect_of_hand += feature_dict.get('aspectOfHand')
 
             accessories = feature_dict.get('accessories')
+
             gender = feature_dict.get('gender')
 
             if aspect_of_hand != '':
                 filtered_images_metadata = filtered_images_metadata[
-                    (filtered_images_metadata['aspectOfHand'] == aspect_of_hand)]
+                    (filtered_images_metadata['aspectOfHand'].str.contains(aspect_of_hand))]
 
             if accessories:
                 filtered_images_metadata = filtered_images_metadata[
