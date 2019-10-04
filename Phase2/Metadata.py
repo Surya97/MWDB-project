@@ -31,15 +31,14 @@ class Metadata:
                 (filtered_images_metadata['imageName'].isin(self.test_images_list))]
 
         if feature_dict is not None:
-            aspect_of_hand = ''
-            if feature_dict.get('aspectOfHand'):
-                aspect_of_hand += feature_dict.get('aspectOfHand')
+
+            aspect_of_hand = feature_dict.get('aspectOfHand')
 
             accessories = feature_dict.get('accessories')
 
             gender = feature_dict.get('gender')
 
-            if aspect_of_hand != '':
+            if aspect_of_hand:
                 filtered_images_metadata = filtered_images_metadata[
                     (filtered_images_metadata['aspectOfHand'].str.contains(aspect_of_hand))]
 
