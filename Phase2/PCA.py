@@ -35,7 +35,7 @@ class PCAModel:
     def get_decomposed_data_matrix(self):
         return self.decomposed_database_matrix
 
-    def print_term_weight_pairs(self,k=-1):
+    def print_term_weight_pairs(self, k=-1):
         eigen_values = self.get_feature_weight_values()
         eigen_vectors = self.get_eigen_vectors()
         count = 1
@@ -47,7 +47,6 @@ class PCAModel:
             print("Eigen Vector:", eigen_vector)
             print()
             count += 1
-
 
     def get_data_latent_semantics(self):
         return self.decomposed_database_matrix

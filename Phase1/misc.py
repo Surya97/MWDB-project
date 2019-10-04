@@ -11,13 +11,13 @@ import pickle
 
 
 def get_images_in_directory(path):
-    dirname = os.path.dirname(__file__)
-    print(dirname)
-    complete_path = os.path.join(dirname, path)
-    #print("Complete path", complete_path)
+    # dirname = os.path.dirname(__file__)
+    # print(dirname)
+    # complete_path = os.path.join(dirname, path)
+    # #print("Complete path", complete_path)
     files = {}
-    for filename in os.listdir(complete_path):
-        files[filename] = os.path.join(complete_path, filename)
+    for filename in os.listdir(path):
+        files[filename] = os.path.join(path, filename)
     return files
 
 

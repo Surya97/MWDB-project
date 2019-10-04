@@ -34,7 +34,7 @@ class SVD:
         #     print(self.reduced_database_matrix[i])
         return self.reduced_database_matrix
 
-    def print_term_weight_pairs(self,k=-1):
+    def print_term_weight_pairs(self, k=-1):
         eigen_vectors = self.get_eigen_vectors()
         eigen_values = self.get_feature_weight_values()
         count = 1
