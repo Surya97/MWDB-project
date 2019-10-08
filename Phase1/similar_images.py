@@ -1,7 +1,7 @@
-from features_images import FeaturesImages
+from Phase1.features_images import FeaturesImages
 import os
 from pathlib import Path
-import misc
+from Phase1 import misc
 from tqdm import tqdm
 import collections
 
@@ -76,7 +76,9 @@ class Similarity:
                 print('Runnning Task1 for the Particular (model,Reduction) to get the pickle file')
                 decomposition.dimensionality_reduction()
 
-            dataset_images_features = misc.load_from_pickle(reduced_dimension_pickle_path,feature+decomposition.decomposition_name, self.k)
+            # dataset_images_features = misc.load_from_pickle(reduced_dimension_pickle_path,feature+decomposition.decomposition_name, self.k)
+            dataset_images_features = misc.load_from_pickle(reduced_dimension_pickle_path,
+                                                            'LBP_PCA_gender_male', self.k)
             test_image_features = dataset_images_features[self.test_image_id]
             return test_image_features, dataset_images_features
 

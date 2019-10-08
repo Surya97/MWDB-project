@@ -1,6 +1,6 @@
 import sys
-from features_images import FeaturesImages
-from similar_images import Similarity
+from Phase1.features_images import FeaturesImages
+from Phase1.similar_images import Similarity
 
 
 task = input("Please specify the task number: ")

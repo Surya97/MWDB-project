@@ -1,5 +1,5 @@
 from skimage import feature
-import misc
+from Phase1 import misc
 import os
 import collections
 import numpy as np

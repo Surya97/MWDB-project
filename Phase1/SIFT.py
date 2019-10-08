@@ -2,7 +2,7 @@
 import cv2
 import os
 import collections
-import misc
+from Phase1 import misc
 import sys
 from tqdm import tqdm
 

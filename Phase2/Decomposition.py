@@ -1,13 +1,13 @@
 import sys
 sys.path.insert(1, '../Phase1')
-from features_images import FeaturesImages
-import misc
+from Phase1.features_images import FeaturesImages
+from Phase1 import misc
 import os
 from pathlib import Path
-from PCA import PCAModel
-from SVD import SVD
-from NMF import NMFModel
-from LDA import LDAModel
+from Phase2.PCA import PCAModel
+from Phase2.SVD import SVD
+from Phase2.NMF import NMFModel
+from Phase2.LDA import LDAModel
 
 
 class Decomposition:

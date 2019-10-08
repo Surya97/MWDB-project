@@ -1,8 +1,8 @@
 #!/usr/bin/python
-from feature_images import FeaturesImages
-from HOG import *
-from LBP import LocalBinaryPatterns
-from ColorMoments import ColorMoments
-from SIFT import SIFT
-from misc import *
-from similar_images import *
+from Phase1.features_images import FeaturesImages
+from Phase1.HOG import *
+from Phase1.LBP import LocalBinaryPatterns
+from Phase1.ColorMoments import ColorMoments
+from Phase1.SIFT import SIFT
+from Phase1.misc import *
+from Phase1.similar_images import *

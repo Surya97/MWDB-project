@@ -2,7 +2,7 @@ from skimage import feature
 import numpy as np
 from scipy.stats import itemfreq
 from itertools import zip_longest
-import misc
+from Phase1 import misc
 import os
 import collections
 

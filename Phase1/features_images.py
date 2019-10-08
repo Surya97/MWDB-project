@@ -1,11 +1,11 @@
 from pathlib import Path
-import misc
+from Phase1 import misc
 import os
 from tqdm import tqdm
-import LBP
-import HOG
-import ColorMoments
-import SIFT
+from Phase1 import LBP
+from Phase1 import HOG
+from Phase1 import ColorMoments
+from Phase1 import SIFT
 import sys
 
 

@@ -1,6 +1,6 @@
 import scipy as sp
 import cv2
-import misc
+from Phase1 import misc
 import os
 import math
 import collections
