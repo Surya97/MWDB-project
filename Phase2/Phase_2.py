@@ -55,5 +55,14 @@ elif task == '3':
                                   metadata_label=metadata_label)
     decomposition.dimensionality_reduction()
 
+elif task == '6' :
+    test_dataset_folder_path = os.path.abspath(
+        os.path.join(Path(os.getcwd()).parent, test_dataset_path))
+    images_list = list(misc.get_images_in_directory(test_dataset_folder_path).keys())
+    metadata = Metadata(images_list)
+
+    sub_map = metadata.subject_matrix(model,decomposition)
+
+
 else:
     print('Please enter the correct task number !')
