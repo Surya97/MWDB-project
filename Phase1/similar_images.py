@@ -78,7 +78,7 @@ class Similarity:
                 print('Runnning Task1 for the Particular (model,Reduction) to get the pickle file')
                 decomposition.dimensionality_reduction()
 
-            dataset_images_features = misc.load_from_pickle(reduced_dimension_pickle_path,+ feature+ '_' +decomposition.decomposition_name, self.k)
+            dataset_images_features = misc.load_from_pickle(reduced_dimension_pickle_path, feature+ '_' +decomposition.decomposition_name, self.k)
             test_image_features = dataset_images_features[self.test_image_id]
             return test_image_features, dataset_images_features
 
