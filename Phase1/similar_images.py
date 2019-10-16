@@ -17,6 +17,9 @@ class Similarity:
         self.test_image_id = test_image_id
         self.k = k
 
+    def set_test_image_id(self,test_image_id):
+        self.test_image_id = test_image_id
+
     def get_similar_images(self, test_folder=None, decomposition=None, reduced_dimension=False,
                            metadata_pickle=None):
         test_folder_path = os.path.join(Path(os.path.dirname(__file__)).parent, test_folder)
@@ -86,15 +89,22 @@ class Similarity:
                 print('Pickle file not found for the Particular (model,Reduction)')
                 print('Runnning Task1 for the Particular (model,Reduction) to get the pickle file')
                 decomposition.dimensionality_reduction()
-
-            dataset_images_features = misc.load_from_pickle(reduced_dimension_pickle_path,
-                                                            feature+decomposition.decomposition_name, self.k)
+            dataset_images_features = misc.load_from_pickle(reduced_dimension_pickle_path, feature + '_' +
+                                                            decomposition.decomposition_name, self.k)
             test_image_features = dataset_images_features[self.test_image_id]
             return test_image_features, dataset_images_features
 
+    def get_similarity_value(self,images_list, dataset_images_features):
 
+        feature = self.model_name
+        features_images = FeaturesImages(feature)
+        model = features_images.get_model()
 
+        test_image_features = dataset_images_features[self.test_image_id]
+        similarity_value = 0
+        for sub_image_id in images_list:
+            subject_image_features = dataset_images_features[sub_image_id]
+            similarity_value = similarity_value + model.similarity_fn(test_image_features, subject_image_features)
 
-
-
+        return similarity_value
 
