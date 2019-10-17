@@ -90,15 +90,24 @@ elif task == '4':
     similarity = Similarity(model, test_image_id, m)
     similarity.get_similar_images(test_dataset_path, decomposition=decomposition, reduced_dimension=True,
                                   metadata_pickle=pickle_file_path)
-
 elif task == '6':
     test_dataset_folder_path = os.path.abspath(
         os.path.join(Path(os.getcwd()).parent, test_dataset_path))
     images_list = list(misc.get_images_in_directory(test_dataset_folder_path).keys())
     metadata = Metadata(images_list)
 
-    sub_map = metadata.subject_matrix(model, decomposition_model)
+    sub_sub_list = metadata.sub_sub_list(model, decomposition_model,0)
+    print(sub_sub_list[0])
+    print(sub_sub_list[1])
+    print(sub_sub_list[2])
 
+elif task == '7':
+    test_dataset_folder_path = os.path.abspath(
+        os.path.join(Path(os.getcwd()).parent, test_dataset_path))
+    images_list = list(misc.get_images_in_directory(test_dataset_folder_path).keys())
+    metadata = Metadata(images_list)
+
+    sub_sub_matrix = metadata.subject_matrix(model, decomposition_model)
 
 else:
     print('Please enter the correct task number !')
