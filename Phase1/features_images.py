@@ -7,7 +7,7 @@ import HOG
 import ColorMoments
 import SIFT
 import sys
-from sklearn.cluster import KMeans
+from sklearn.cluster import MiniBatchKMeans
 
 '''
 Class for handling all the feature vector generation for both single and multiple images
@@ -61,9 +61,14 @@ class FeaturesImages:
             for i in range(len(images)):
                 folder_images_features_dict[images[i]] = features_image_folder[i]
 
-            if self.model_name=='SIFT':
-                folder_images_features_dict = self.compute_sift_new_features(folder_images_features_dict)
-            misc.save2pickle(folder_images_features_dict, os.path.dirname(__file__), feature=self.model_name)
+            if self.model_name == 'SIFT':
+                folder_images_features_dict_sift_new  = self.compute_sift_new_features(folder_images_features_dict)
+                misc.save2pickle(folder_images_features_dict_sift_new, os.path.dirname(__file__),
+                                 feature=self.model_name)
+                misc.save2pickle(folder_images_features_dict, os.path.dirname(__file__),
+                                 feature=self.model_name + "_OLD")
+            else:
+                misc.save2pickle(folder_images_features_dict, os.path.dirname(__file__), feature=self.model_name)
 
 
     '''
@@ -120,7 +125,7 @@ class FeaturesImages:
 
         n_clusters = min_val
         #int(sum / images_num) #taking so much time - better to fix some value
-        kmeans = KMeans(n_clusters)
+        kmeans = MiniBatchKMeans(n_clusters)
         print('Applying k-means algorithm on all the keypoint descriptors  of all images')
         kmeans.fit(input_k_means)
 
@@ -138,7 +143,7 @@ class FeaturesImages:
             reduced_feature_img = [0] * n_clusters
 
             for cluster_num in closest_cluster:
-                reduced_feature_img[cluster_num] = reduced_feature_img[cluster_num] + 1;
+                reduced_feature_img[cluster_num] = reduced_feature_img[cluster_num] + 1
             image_features[image_id] = reduced_feature_img
 
         folder_images_features_dict = {}
