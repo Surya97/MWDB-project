@@ -190,3 +190,43 @@ class Metadata:
 
 
         return [similarity_val]
+
+    def get_binary_image_metadata(self):
+
+        if self.images_metadata is None:
+            self.set_images_metadata()
+
+        filtered_images_metadata = self.images_metadata
+
+        # print('test_images_list', self.test_images_list)
+
+        if self.test_images_list is not None:
+            filtered_images_metadata = filtered_images_metadata[
+                (filtered_images_metadata['imageName'].isin(self.test_images_list))]
+
+
+        #print(filtered_images_metadata)
+
+        image_binary_map ={}
+        binary_image_metadata_matrix = []
+        k=1
+        # Matrix columns are left, right, dorsal, palmar, accessories, without accessories, male, female
+
+        for row in filtered_images_metadata.itertuples():
+            binary_matrix_row = []
+            binary_matrix_row += [1 if 'left' in row.aspectOfHand else 0]
+            binary_matrix_row += [1 if 'right' in row.aspectOfHand else 0]
+            binary_matrix_row += [1 if 'dorsal' in row.aspectOfHand else 0]
+            binary_matrix_row += [1 if 'palmar' in row.aspectOfHand else 0]
+            binary_matrix_row += [row.accessories]
+            binary_matrix_row += [1 if 'male' in row.gender else 0]
+            binary_matrix_row += [1 if 'female' in row.gender else 0]
+
+            binary_image_metadata_matrix.append(binary_matrix_row)
+
+
+        return binary_image_metadata_matrix
+
+
+
+
