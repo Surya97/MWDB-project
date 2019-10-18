@@ -7,28 +7,12 @@ import misc
 from prettytable import PrettyTable
 
 
-
-def subject_subject_similarity(data_frame1, data_frame2, model, dataset_images_features):
-
-    list1 = data_frame1['imageName'].tolist()
-    list2 = data_frame2['imageName'].tolist()
-
-    similarity = Similarity(model)
-
-    similarity_val = 0
-    for image_id in list1:
-        similarity.set_test_image_id(image_id)
-        similarity_val = similarity_val + similarity.get_similarity_value(list2,dataset_images_features)
-
-    return [similarity_val]
-
-
 class Metadata:
     def __init__(self, test_images_list=None):
         self.test_images_list = test_images_list
         self.metadata_file_path = os.path.join(Path(os.path.dirname(__file__)).parent, 'data/HandInfo.csv')
         self.reduced_dimension_pickle_path = os.path.join(Path(os.path.dirname(__file__)).parent,
-                                                     'Phase2', 'pickle_files')
+                                                          'Phase2', 'pickle_files')
         self.images_metadata = None
         self.set_images_metadata()
 
@@ -90,11 +74,8 @@ class Metadata:
             is_subject_id = filtered_images_metadata['id'] == sub_id
             subject_map[sub_id] = filtered_images_metadata[is_subject_id]
 
-
-        reduced_dimension_pickle_path = os.path.join(Path(os.path.dirname(__file__)).parent,
-                                                     'Phase2', 'pickle_files')
-        #for now taking - number of latent semantics as 20(max_val)
-        dataset_images_features = misc.load_from_pickle(reduced_dimension_pickle_path,
+        # for now taking - number of latent semantics as 20(max_val)
+        dataset_images_features = misc.load_from_pickle(self.reduced_dimension_pickle_path,
                                                         model + '_' + decomposition, 20)
         similarity_list_of_pair = [0]
         for sub2 in sub_ids_list:
@@ -106,7 +87,6 @@ class Metadata:
         similarity_list_of_pair = sorted(similarity_list_of_pair, key=lambda x: x[0])
 
         return similarity_list_of_pair
-
 
     def subject_matrix(self, model, decomposition):
         if self.images_metadata is None:
@@ -153,14 +133,12 @@ class Metadata:
 
         return similarity_matrix
 
-
     def subject_subject_similarity(self,data_frame1,data_frame2, model, dataset_images_features):
 
         similarity_val = 0
         similarity = Similarity(model, '', 0)
 
-
-        #dorsal left
+        # dorsal left
         is_dorsal_left1 = data_frame1['aspectOfHand'] == 'dorsal left'
         list1 = data_frame1[is_dorsal_left1]['imageName'].tolist()
         is_dorsal_left2 = data_frame2['aspectOfHand'] == 'dorsal left'
@@ -170,8 +148,7 @@ class Metadata:
             similarity.set_test_image_id(image_id)
             similarity_val = similarity_val + similarity.get_similarity_value(list2, dataset_images_features)
 
-
-        #dorsal right
+        # dorsal right
         is_dorsal_right1 = data_frame1['aspectOfHand'] == 'dorsal right'
         list1 = data_frame1[is_dorsal_right1]['imageName'].tolist()
         is_dorsal_right2 = data_frame2['aspectOfHand'] == 'dorsal right'
@@ -181,8 +158,7 @@ class Metadata:
             similarity.set_test_image_id(image_id)
             similarity_val = similarity_val + similarity.get_similarity_value(list2, dataset_images_features)
 
-
-        #palmar left
+        # palmar left
         is_palmar_left1 = data_frame1['aspectOfHand'] == 'palmar left'
         list1 = data_frame1[is_palmar_left1]['imageName'].tolist()
         is_palmar_left2 = data_frame2['aspectOfHand'] == 'palmar left'
@@ -192,8 +168,7 @@ class Metadata:
             similarity.set_test_image_id(image_id)
             similarity_val = similarity_val + similarity.get_similarity_value(list2, dataset_images_features)
 
-
-        #palmar right
+        # palmar right
         is_palmar_right1 = data_frame1['aspectOfHand'] == 'palmar right'
         list1 = data_frame1[is_palmar_right1]['imageName'].tolist()
         is_palmar_right2 = data_frame2['aspectOfHand'] == 'palmar right'
@@ -202,7 +177,6 @@ class Metadata:
         for image_id in list1:
             similarity.set_test_image_id(image_id)
             similarity_val = similarity_val + similarity.get_similarity_value(list2, dataset_images_features)
-
 
         return [similarity_val]
 
@@ -219,9 +193,7 @@ class Metadata:
             filtered_images_metadata = filtered_images_metadata[
                 (filtered_images_metadata['imageName'].isin(self.test_images_list))]
 
-
-        #print(filtered_images_metadata)
-
+        # print(filtered_images_metadata)
         image_binary_map ={}
         binary_image_metadata_matrix = []
         k=1
@@ -238,7 +210,6 @@ class Metadata:
             binary_matrix_row += [1 if 'female' in row.gender else 0]
 
             binary_image_metadata_matrix.append(binary_matrix_row)
-
 
         return binary_image_metadata_matrix
 
