@@ -67,14 +67,11 @@ def save2pickle(tuples, path, feature):
     outfile.close()
 
 
-def load_from_pickle(path, feature,k=-1):
-    final_path = os.path.join(path, feature+'.pkl')
+def load_from_pickle(path, feature=None, k=-1):
+    final_path = os.path.join(path, (feature or '') + '.pkl')
     print('loading from pickle file path', final_path)
     infile = open(final_path, 'rb')
     dataset_features = pickle.load(infile)
-    if k!=-1:
-        for image_id, feature_vector in dataset_features.items():
-            dataset_features[image_id]=feature_vector[:k]
     return dataset_features
 
 
