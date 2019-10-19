@@ -268,15 +268,15 @@ class Metadata:
 
         for metadata_feature_class_1 in class_1_images_features:
             similarity_map.append(tuple(("1", euclidean_distance(self.unlabeled_image_features,
-                                                            metadata_feature_class_1))))
+                                                                 metadata_feature_class_1))))
 
         for metadata_feature_class_0 in class_0_images_features:
             similarity_map.append(tuple(("0", euclidean_distance(self.unlabeled_image_features,
-                                                            metadata_feature_class_0))))
+                                                                 metadata_feature_class_0))))
 
+        similarity_map = sorted(similarity_map, key=lambda x: x[1], reverse=False)
         print(feature_name, similarity_map)
         print("****************************************************************")
-        similarity_map = sorted(similarity_map, key=lambda x: x[1], reverse=False)
 
         count_1 = 0
         count_0 = 0
