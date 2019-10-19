@@ -153,5 +153,15 @@ elif task == '8':
     metadata = Metadata(images_list)
 
     binary_image_metadata_matrix = metadata.get_binary_image_metadata()
+
+elif task == '9':
+    test_dataset_folder_path = os.path.abspath(
+        os.path.join(Path(os.getcwd()).parent, test_dataset_path))
+    images_list = list(misc.get_images_in_directory(test_dataset_folder_path).keys())
+    metadata = Metadata(images_list)
+
+    metadata.sub_sub_new()
+
+
 else:
     print('Please enter the correct task number !')
