@@ -160,12 +160,17 @@ elif task == '6':
 elif task == '7':
     model = input("1.CM\n2.LBP\n3.HOG\n4.SIFT\nSelect model: ")
     decomposition_model = input("1.PCA\n2.SVD\n3.NMF\n4.LDA\nSelect decomposition: ")
+    k = int(input("Enter the number of latent features to consider: "))
     test_dataset_folder_path = os.path.abspath(
         os.path.join(Path(os.getcwd()).parent, test_dataset_path))
     images_list = list(misc.get_images_in_directory(test_dataset_folder_path).keys())
     metadata = Metadata(images_list)
 
     sub_sub_matrix = metadata.subject_matrix(model, decomposition_model)
+    nmf = NMFModel(sub_sub_matrix, k, images_list)
+    nmf.decompose()
+    print('Decomposition Complete')
+    nmf.print_term_weight_pairs(k)
 
 elif task == '8':
     test_dataset_folder_path = os.path.abspath(
