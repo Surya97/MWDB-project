@@ -119,14 +119,14 @@ class FeaturesImages:
                 # Note : haven't used x,y,scale,orientation
                 input_k_means.append(feature_descriptor[4:])
             sum = sum + len(feature_vector)
-            if len(feature_vector) < min_val:
+            len_featurevec = len(feature_vector)
+            if  len_featurevec!=1 and len_featurevec < min_val:
                 min_val = len(feature_vector)
             images_num = images_num + 1
 
         n_clusters = min_val
         #int(sum / images_num) #taking so much time - better to fix some value
-        kmeans = MiniBatchKMeans(n_clusters)
-        print('Applying k-means algorithm on all the keypoint descriptors  of all images')
+        kmeans = MiniBatchKMeans(n_clusters, random_state=42)
         kmeans.fit(input_k_means)
 
         row_s = 0
@@ -134,8 +134,7 @@ class FeaturesImages:
         k = 0
 
         image_features = {}
-        print('Equating the number of features for all the images : ')
-        for image_id, feature_vector in tqdm(dataset_images_features.items()):
+        for image_id, feature_vector in dataset_images_features.items():
             row_s = row_s + k
             k = len(feature_vector)
             row_e = row_e + k

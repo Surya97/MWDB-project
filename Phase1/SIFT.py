@@ -40,4 +40,6 @@ class SIFT:
                                keypoints[index].angle]
             keypoint_vector += list(descriptor[index])
             image_feature.append(keypoint_vector)
+
+
         return image_feature
