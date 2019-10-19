@@ -47,7 +47,7 @@ class NMFModel:
         return term_weight_dict_sorted
 
     def get_decomposed_data_matrix(self):
-        return self.reduced_database_matrix[:, self.k_components]
+        return self.reduced_database_matrix[:, :self.k_components]
 
     def print_term_weight_pairs(self, k=-1):
         for idx in range(k):
@@ -59,6 +59,10 @@ class NMFModel:
             feature_latentsemantics_term_weight = self.get_feature_latent_semantic_term_weight_sorted(idx)
             print(feature_latentsemantics_term_weight)
             print("****************************************************************************************")
+
+    def get_new_image_features_in_latent_space(self, image_features):
+        latent_features = self.nmf.transform(image_features)
+        return latent_features[0][:self.k_components]
 
 
 
