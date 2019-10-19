@@ -145,28 +145,29 @@ elif task == '5':
     print(unlabeled_list)
 
 elif task == '6':
-    model = input("1.CM\n2.LBP\n3.HOG\n4.SIFT\nSelect model: ")
-    decomposition_model = input("1.PCA\n2.SVD\n3.NMF\n4.LDA\nSelect decomposition: ")
     test_dataset_folder_path = os.path.abspath(
         os.path.join(Path(os.getcwd()).parent, test_dataset_path))
     images_list = list(misc.get_images_in_directory(test_dataset_folder_path).keys())
     metadata = Metadata(images_list)
+    subject_id = int(input("Please input the subject Id : "))
+    sub_sub_list = metadata.sub_sub_list(subject_id)
+    if sub_sub_list[0]== tuple([-1, -1]) :
+        print('Subject not present in the given dataset')
+    else:
+        print(sub_sub_list[0])
+        print(sub_sub_list[1])
+        print(sub_sub_list[2])
+    metadata.plot_subjects(subject_id,sub_sub_list)
 
-    sub_sub_list = metadata.sub_sub_list(model, decomposition_model,0)
-    print(sub_sub_list[0])
-    print(sub_sub_list[1])
-    print(sub_sub_list[2])
 
 elif task == '7':
-    model = input("1.CM\n2.LBP\n3.HOG\n4.SIFT\nSelect model: ")
-    decomposition_model = input("1.PCA\n2.SVD\n3.NMF\n4.LDA\nSelect decomposition: ")
     k = int(input("Enter the number of latent features to consider: "))
     test_dataset_folder_path = os.path.abspath(
         os.path.join(Path(os.getcwd()).parent, test_dataset_path))
     images_list = list(misc.get_images_in_directory(test_dataset_folder_path).keys())
     metadata = Metadata(images_list)
 
-    sub_sub_matrix = metadata.subject_matrix(model, decomposition_model)
+    sub_sub_matrix = metadata.subject_matrix()
     nmf = NMFModel(sub_sub_matrix, k, images_list)
     nmf.decompose()
     print('Decomposition Complete')
