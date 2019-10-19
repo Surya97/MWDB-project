@@ -139,12 +139,12 @@ class Metadata:
 
         similarity_matrix = []
 
-        for sub1 in sub_ids_list:
+        for sub1 in tqdm(sub_ids_list):
             similarity_row = []
             similarity_row_pair = [0]
             for sub2 in sub_ids_list:
                 if sub1 == sub2:
-                    similarity_row = similarity_row + [-1]
+                    similarity_row = similarity_row + [0]
                 else:
                     sub_sub_val = self.subject_subject_similarity(subject_map[sub1],subject_map[sub2], model, dataset_images_features)
                     similarity_row = similarity_row + sub_sub_val
@@ -175,7 +175,7 @@ class Metadata:
         for i in range(16):
             similarity_val += euclidean_distance(subject1_db_matrix[i], subject2_db_matrix[i])
 
-        return [similarity_val]
+        return [round(similarity_val, 3)]
 
     def get_binary_image_metadata(self):
 
