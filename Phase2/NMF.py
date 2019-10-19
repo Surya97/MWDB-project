@@ -55,7 +55,7 @@ class NMFModel:
             data_latentsemantics_term_weight = self.get_data_latent_semantic_term_weight_sorted(idx)
             print(data_latentsemantics_term_weight)
             print("---------------------------------------------------------------------------------------")
-            print("Printing feature-latentsemantics term-weight pairs for Feature-Latentsemantic- " + str(idx))
+            print("Printing feature-latentsemantics term-weight pairs for Feature-Latentsemantic - " + str(idx))
             feature_latentsemantics_term_weight = self.get_feature_latent_semantic_term_weight_sorted(idx)
             print(feature_latentsemantics_term_weight)
             print("****************************************************************************************")

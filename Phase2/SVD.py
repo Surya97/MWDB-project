@@ -20,7 +20,6 @@ class SVD:
 
     def decompose(self):
         scaled_feature_matrix = scale(self.database_matrix)
-        print("Number of features before and after", str(len(self.database_matrix[0])), str(len(scaled_feature_matrix[0])))
         self.u, self.s, self.vh = svd(scaled_feature_matrix, full_matrices=True)
         self.get_decomposed_data_matrix()
 
@@ -52,7 +51,7 @@ class SVD:
             data_latentsemantics_term_weight = self.get_data_latent_semantic_term_weight_sorted(idx)
             print(data_latentsemantics_term_weight)
             print("---------------------------------------------------------------------------------------")
-            print("Printing feature-latentsemantics term-weight pairs for Feature-Latentsemantic- " + str(idx))
+            print("Printing feature-latentsemantics term-weight pairs for Feature-Latentsemantic - " + str(idx))
             feature_latentsemantics_term_weight = self.get_feature_latent_semantic_term_weight_sorted(idx)
             print(feature_latentsemantics_term_weight)
             print("****************************************************************************************")

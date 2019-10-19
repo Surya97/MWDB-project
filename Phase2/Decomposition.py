@@ -49,8 +49,6 @@ class Decomposition:
         # this is because the database_matrix has <=20 images and the reduction models,
         # should have n_components parameters <= n,m
         # Hence, we have to take the min(min(len(self.database_matrix[0]),len(self.database_matrix)),20)
-        self.k_components = min(len(self.database_matrix[0]), len(self.database_matrix), self.k_components)
-
         if self.decomposition_name == 'PCA':
             self.decomposition_model = PCAModel(self.database_matrix, self.k_components, self.database_image_id)
         elif self.decomposition_name == 'SVD':

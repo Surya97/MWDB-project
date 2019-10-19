@@ -7,13 +7,23 @@ import misc
 from prettytable import PrettyTable
 
 
+def euclidean_distance(dist1, dist2):
+    return (sum([(a-b)**2 for a, b in zip(dist1, dist2)]))**0.5
+
+
+def kl_divergence(p, q):
+    return np.sum(np.where(p != 0, p * np.log(p / q), 0))
+
+
 class Metadata:
     def __init__(self, test_images_list=None):
         self.test_images_list = test_images_list
         self.metadata_file_path = os.path.join(Path(os.path.dirname(__file__)).parent, 'data/HandInfo.csv')
         self.reduced_dimension_pickle_path = os.path.join(Path(os.path.dirname(__file__)).parent,
                                                           'Phase2', 'pickle_files')
+        self.unlabeled_image_features = None
         self.images_metadata = None
+        self.metadata_images_features = None
         self.set_images_metadata()
 
     def get_images_metadata(self):
@@ -74,9 +84,8 @@ class Metadata:
             is_subject_id = filtered_images_metadata['id'] == sub_id
             subject_map[sub_id] = filtered_images_metadata[is_subject_id]
 
-        # for now taking - number of latent semantics as 20(max_val)
         dataset_images_features = misc.load_from_pickle(self.reduced_dimension_pickle_path,
-                                                        model + '_' + decomposition, 20)
+                                                        model + '_' + decomposition)
         similarity_list_of_pair = [0]
         for sub2 in sub_ids_list:
             sub_sub_val = self.subject_subject_similarity(subject_map[sub1], subject_map[sub2], model,
@@ -105,9 +114,8 @@ class Metadata:
             is_subject_id = filtered_images_metadata['id'] == sub_id
             subject_map[sub_id] = filtered_images_metadata[is_subject_id]
 
-        # for now taking - number of latent semantics as 20(max_val)
         dataset_images_features = misc.load_from_pickle(self.reduced_dimension_pickle_path,
-                                                        model + '_' + decomposition, 20)
+                                                        model + '_' + decomposition)
         similarity_matrix = []
 
         for sub1 in sub_ids_list:
@@ -212,6 +220,93 @@ class Metadata:
             binary_image_metadata_matrix.append(binary_matrix_row)
 
         return binary_image_metadata_matrix
+
+    def set_metadata_image_features(self, pickle_file_path):
+        self.metadata_images_features = misc.load_from_pickle(self.reduced_dimension_pickle_path, pickle_file_path)
+
+    def set_unlabeled_image_features(self, model, test_image_id, decomposition):
+        parent_directory_path = Path(os.path.dirname(__file__)).parent
+        pickle_file_directory_phase1 = os.path.join(parent_directory_path, 'Phase1')
+        test_image_features = list()
+        test_image_features.append(misc.load_from_pickle(pickle_file_directory_phase1, model)[test_image_id])
+        self.unlabeled_image_features = decomposition.decomposition_model.get_new_image_features_in_latent_space(
+            test_image_features)
+
+    def get_binary_label(self, feature_name):
+        class_1_images_features = []
+        class_0_images_features = []
+        count = 0
+        similarity_map = []
+        if "Left" in feature_name:
+            class_1_images = self.get_specific_metadata_images_list({'aspectOfHand': 'left'})
+            class_0_images = self.get_specific_metadata_images_list({'aspectOfHand': 'right'})
+            class_1_name = "left"
+            class_0_name = "right"
+            for image in class_1_images:
+                class_1_images_features.append(self.metadata_images_features[image])
+            for image in class_0_images:
+                class_0_images_features.append(self.metadata_images_features[image])
+
+        elif "Dorsal" in feature_name:
+            class_1_images = self.get_specific_metadata_images_list({'aspectOfHand': 'dorsal'})
+            class_0_images = self.get_specific_metadata_images_list({'aspectOfHand': 'palmar'})
+            class_1_name = "dorsal"
+            class_0_name = "palmar"
+            for image in class_1_images:
+                class_1_images_features.append(self.metadata_images_features[image])
+            for image in class_0_images:
+                class_0_images_features.append(self.metadata_images_features[image])
+
+        elif "Gender" in feature_name:
+            class_1_images = self.get_specific_metadata_images_list({'gender': 'male'})
+            class_0_images = self.get_specific_metadata_images_list({'gender': 'female'})
+            class_1_name = "male"
+            class_0_name = "female"
+            for image in class_1_images:
+                class_1_images_features.append(self.metadata_images_features[image])
+            for image in class_0_images:
+                class_0_images_features.append(self.metadata_images_features[image])
+
+        elif "Accessories" in feature_name:
+            class_1_images = self.get_specific_metadata_images_list({'accessories': 1})
+            class_0_images = self.get_specific_metadata_images_list({'accessories': 0})
+            class_1_name = "with accessories"
+            class_0_name = "without accessories"
+            for image in class_1_images:
+                class_1_images_features.append(self.metadata_images_features[image])
+            for image in class_0_images:
+                class_0_images_features.append(self.metadata_images_features[image])
+
+        for metadata_feature_class_1 in class_1_images_features:
+            similarity_map.append(tuple(("1", euclidean_distance(self.unlabeled_image_features,
+                                                            metadata_feature_class_1))))
+
+        for metadata_feature_class_0 in class_0_images_features:
+            similarity_map.append(tuple(("0", euclidean_distance(self.unlabeled_image_features,
+                                                            metadata_feature_class_0))))
+
+        print(feature_name, similarity_map)
+        print("****************************************************************")
+        similarity_map = sorted(similarity_map, key=lambda x: x[1], reverse=False)
+
+        count_1 = 0
+        count_0 = 0
+
+        k_nearest = len(self.metadata_images_features.items())//2
+        for idx in range(k_nearest):
+            if similarity_map[idx][0] == "1":
+                count_1 += 1
+            else:
+                count_0 += 1
+
+        if count_1 >= count_0:
+            return class_1_name
+
+        return class_0_name
+
+
+
+
 
 
 
