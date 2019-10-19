@@ -56,6 +56,15 @@ class SVD:
             print(feature_latentsemantics_term_weight)
             print("****************************************************************************************")
 
+    def get_new_image_features_in_latent_space(self, image_features):
+        print("Before", len(self.database_matrix), len(self.database_matrix[0]))
+        self.database_matrix.append(image_features[0])
+        print(len(self.database_matrix), len(self.database_matrix[0]))
+        print(len(self.database_matrix[-1]))
+        self.decompose()
+        print()
+        return self.reduced_database_matrix[-1]
+
 
 
 
