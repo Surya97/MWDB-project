@@ -84,7 +84,7 @@ class Metadata:
         images_list = filtered_images_metadata['imageName'].tolist()
         return images_list
 
-    def sub_sub_list(self, model, decomposition,sub1):
+    def sub_sub_list(self, sub1):
         if self.images_metadata is None:
             self.set_images_metadata()
 
@@ -99,14 +99,19 @@ class Metadata:
         for sub_id in sub_ids_list:
             is_subject_id = filtered_images_metadata['id'] == sub_id
             subject_map[sub_id] = filtered_images_metadata[is_subject_id]
+
         parent_directory_path = Path(os.path.dirname(__file__)).parent
         pickle_file_directory = os.path.join(parent_directory_path, 'Phase1')
         dataset_images_features = misc.load_from_pickle(pickle_file_directory, 'SIFT_OLD')
+
+
         # for now taking - number of latent semantics as 20(max_val)
         similarity_list_of_pair = [0]
+        if sub1 not in sub_ids_list:
+            return [tuple([-1, -1])]
         for sub2 in tqdm(sub_ids_list):
             if sub1!=sub2:
-                sub_sub_val = self.subject_subject_similarity(subject_map[sub1], subject_map[sub2], model,
+                sub_sub_val = self.subject_subject_similarity(subject_map[sub1], subject_map[sub2],
                                                           dataset_images_features)
                 similarity_list_of_pair.append(tuple([sub_sub_val, sub2]))
 
@@ -115,7 +120,7 @@ class Metadata:
 
         return similarity_list_of_pair
 
-    def subject_matrix(self, model, decomposition):
+    def subject_matrix(self):
         if self.images_metadata is None:
             self.set_images_metadata()
 
@@ -146,7 +151,7 @@ class Metadata:
                 if sub1 == sub2:
                     similarity_row = similarity_row + [0]
                 else:
-                    sub_sub_val = self.subject_subject_similarity(subject_map[sub1],subject_map[sub2], model, dataset_images_features)
+                    sub_sub_val = self.subject_subject_similarity(subject_map[sub1],subject_map[sub2], dataset_images_features)
                     similarity_row = similarity_row + sub_sub_val
 
             similarity_matrix.append(similarity_row)
@@ -162,7 +167,7 @@ class Metadata:
 
         return similarity_matrix
 
-    def subject_subject_similarity(self,data_frame1,data_frame2, model, dataset_images_features):
+    def subject_subject_similarity(self,data_frame1,data_frame2, dataset_images_features):
 
         similarity_val = 0
 
@@ -319,7 +324,7 @@ class Metadata:
         for metadata_arr in metadata_arr_list:
             count = count + 1
             sift_cluster_vector = self.get_metadata_sift_feature_vector(data_frame, metadata_arr, dataset_images_features)
-            metadata_vectors_16_map['str'+str(count)] = sift_cluster_vector
+            metadata_vectors_16_map['combination'+str(count)] = sift_cluster_vector
 
         metadata_vectors_16_map = features_image.compute_sift_new_features(metadata_vectors_16_map)
 
@@ -348,8 +353,8 @@ class Metadata:
                 for feature_descriptor in feature_vector:
                     # Note : haven't used x,y,scale,orientation
                     input_k_means.append(feature_descriptor[4:])
-                    if len(feature_vector) < min_val:
-                        min_val = len(feature_vector)
+                if len(feature_vector) < min_val:
+                    min_val = len(feature_vector)
                 total = total + len(feature_vector)
                 images_num = images_num + 1
         n_clusters = min_val
@@ -362,4 +367,28 @@ class Metadata:
             return one_keypoint
         return kmeans.cluster_centers_
 
+    def plot_subjects(self, main_subject, sub_sub_list):
 
+
+        sub_ids_list = [main_subject]
+        for tup in sub_sub_list :
+            sub_ids_list += [tup[1]]
+
+        if self.images_metadata is None:
+            self.set_images_metadata()
+
+        filtered_images_metadata = self.images_metadata
+        if self.test_images_list is not None:
+            filtered_images_metadata = filtered_images_metadata[
+                (filtered_images_metadata['imageName'].isin(self.test_images_list))]
+
+        subject_map = {}
+        for sub_id in sub_ids_list:
+            is_subject_id = filtered_images_metadata['id'] == sub_id
+            subject_map[sub_id] = filtered_images_metadata[is_subject_id]
+
+        subject_images_list = {}
+        for sub_id, data_frame in subject_map.items():
+            subject_images_list[sub_id] = data_frame['imageName'].tolist()
+
+        #take the similarity values from sub_sub_list tuple
