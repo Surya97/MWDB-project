@@ -124,8 +124,9 @@ class FeaturesImages:
                 min_val = len(feature_vector)
             images_num = images_num + 1
 
-        n_clusters = min_val
-        #int(sum / images_num) #taking so much time - better to fix some value
+        # n_clusters = int(sum / images_num)
+        n_clusters = 300
+        # int(sum / images_num) #taking so much time - better to fix some value
         kmeans = MiniBatchKMeans(n_clusters, random_state=42)
         kmeans.fit(input_k_means)
 
