@@ -25,8 +25,9 @@ elif task == '2':
     model = input("1.CM\n2.LBP\n3.HOG\n4.SIFT\nSelect model: ")
     decomposition_model = input("1.PCA\n2.SVD\n3.NMF\n4.LDA\nSelect decomposition: ")
     image_id = input("Please specify the test image file name: ")
+    k = int(input("Please specify the number of components : "))
     m = int(input("Please specify the value of m: "))
-    decomposition = Decomposition(decomposition_model, m, model, test_dataset_path)
+    decomposition = Decomposition(decomposition_model, k, model, test_dataset_path)
     similarity = Similarity(model, image_id, m)
     similarity.get_similar_images(test_dataset_path, decomposition, reduced_dimension=True)
 
