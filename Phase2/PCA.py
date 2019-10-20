@@ -11,7 +11,7 @@ class PCAModel:
     def __init__(self, database_matrix, k_components, image_id):
         self.database_matrix = database_matrix
         self.k_components = k_components
-        self.pca = PCA()
+        self.pca = PCA(random_state=42)
         self.database_image_list = image_id
         self.reduced_database_matrix = None
 
