@@ -357,7 +357,7 @@ class Metadata:
                     min_val = len(feature_vector)
                 total = total + len(feature_vector)
                 images_num = images_num + 1
-        n_clusters = min_val
+        n_clusters = 300
 
         if n_clusters != 0:
             kmeans = MiniBatchKMeans(n_clusters, random_state=42)
@@ -390,7 +390,12 @@ class Metadata:
         subject_images_list = {}
         count = 0
         for sub_id, data_frame in subject_map.items():
-            subject_images_list[sub_id] = {'imageList': [os.path.join(test_image_directory_path, image)
+            if sub_id == main_subject :
+                subject_images_list[sub_id] = {'imageList': [os.path.join(test_image_directory_path, image)
+                                                             for image in data_frame['imageName'].tolist()],
+                                               'value': 0}
+            else :
+                subject_images_list[sub_id] = {'imageList': [os.path.join(test_image_directory_path, image)
                                                          for image in data_frame['imageName'].tolist()],
                                            'value': sub_sub_similarity_pairs[sub_id]}
             count += 1
