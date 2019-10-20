@@ -8,6 +8,7 @@ import ColorMoments
 import SIFT
 import sys
 from sklearn.cluster import MiniBatchKMeans
+import numpy as np
 
 '''
 Class for handling all the feature vector generation for both single and multiple images
@@ -61,12 +62,14 @@ class FeaturesImages:
             for i in range(len(images)):
                 folder_images_features_dict[images[i]] = features_image_folder[i]
 
+            # print(folder_images_features_dict)
+
             if self.model_name == 'SIFT':
-                folder_images_features_dict_sift_new  = self.compute_sift_new_features(folder_images_features_dict)
-                misc.save2pickle(folder_images_features_dict_sift_new, os.path.dirname(__file__),
-                                 feature=self.model_name)
                 misc.save2pickle(folder_images_features_dict, os.path.dirname(__file__),
                                  feature=self.model_name + "_OLD")
+                folder_images_features_dict_sift_new = self.compute_sift_new_features(folder_images_features_dict)
+                misc.save2pickle(folder_images_features_dict_sift_new, os.path.dirname(__file__),
+                                 feature=self.model_name)
             else:
                 misc.save2pickle(folder_images_features_dict, os.path.dirname(__file__), feature=self.model_name)
 
@@ -94,8 +97,7 @@ class FeaturesImages:
                     if len(image_feature) == 0:
                         image_feature = window_pattern
                     else:
-                        image_feature += window_pattern
-                # print(len(image_feature))
+                        image_feature = np.concatenate([image_feature, window_pattern])
             else:
                 image_feature = self.model.compute(converted_image)
         except OSError as e:

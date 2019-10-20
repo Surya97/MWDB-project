@@ -152,13 +152,13 @@ elif task == '6':
     metadata = Metadata(images_list)
     subject_id = int(input("Please input the subject Id : "))
     sub_sub_list = metadata.sub_sub_list(subject_id)
-    if sub_sub_list[0]== tuple([-1, -1]) :
+    if sub_sub_list[0] == tuple([-1, -1]):
         print('Subject not present in the given dataset')
     else:
         print(sub_sub_list[0])
         print(sub_sub_list[1])
         print(sub_sub_list[2])
-    metadata.plot_subjects(subject_id,sub_sub_list)
+    metadata.plot_subjects(subject_id, sub_sub_list, test_dataset_folder_path)
 
 
 elif task == '7':
@@ -167,7 +167,6 @@ elif task == '7':
         os.path.join(Path(os.getcwd()).parent, test_dataset_path))
     images_list = list(misc.get_images_in_directory(test_dataset_folder_path).keys())
     metadata = Metadata(images_list)
-
     sub_sub_matrix = metadata.subject_matrix()
     nmf = NMFModel(sub_sub_matrix, k, images_list)
     nmf.decompose()

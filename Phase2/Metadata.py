@@ -1,14 +1,16 @@
+import sys
+sys.path.insert(1, '../Phase1')
+import misc
 import os
 import numpy as np
 import pandas as pd
 from pathlib import Path
-from similar_images import Similarity
-import misc
 from features_images import FeaturesImages
 from prettytable import PrettyTable
 from sklearn.cluster import MiniBatchKMeans
 from PCA import PCAModel
 from tqdm import tqdm
+
 
 
 def euclidean_distance(dist1, dist2):
@@ -104,8 +106,6 @@ class Metadata:
         pickle_file_directory = os.path.join(parent_directory_path, 'Phase1')
         dataset_images_features = misc.load_from_pickle(pickle_file_directory, 'SIFT_OLD')
 
-
-        # for now taking - number of latent semantics as 20(max_val)
         similarity_list_of_pair = [0]
         if sub1 not in sub_ids_list:
             return [tuple([-1, -1])]
@@ -113,10 +113,10 @@ class Metadata:
             if sub1!=sub2:
                 sub_sub_val = self.subject_subject_similarity(subject_map[sub1], subject_map[sub2],
                                                           dataset_images_features)
-                similarity_list_of_pair.append(tuple([sub_sub_val, sub2]))
+                similarity_list_of_pair.append(tuple([sub2, sub_sub_val]))
 
         similarity_list_of_pair = similarity_list_of_pair[1:]
-        similarity_list_of_pair = sorted(similarity_list_of_pair, key=lambda x: x[0])
+        similarity_list_of_pair = sorted(similarity_list_of_pair, key=lambda x: x[1])
 
         return similarity_list_of_pair
 
@@ -367,12 +367,12 @@ class Metadata:
             return one_keypoint
         return kmeans.cluster_centers_
 
-    def plot_subjects(self, main_subject, sub_sub_list):
-
-
+    def plot_subjects(self, main_subject, sub_sub_list, test_image_directory_path):
         sub_ids_list = [main_subject]
-        for tup in sub_sub_list :
-            sub_ids_list += [tup[1]]
+        sub_sub_similarity_pairs = {}
+        for subject_pair in sub_sub_list:
+            sub_ids_list += [subject_pair[0]]
+            sub_sub_similarity_pairs[subject_pair[0]] = subject_pair[1]
 
         if self.images_metadata is None:
             self.set_images_metadata()
@@ -388,7 +388,16 @@ class Metadata:
             subject_map[sub_id] = filtered_images_metadata[is_subject_id]
 
         subject_images_list = {}
+        count = 0
         for sub_id, data_frame in subject_map.items():
-            subject_images_list[sub_id] = data_frame['imageName'].tolist()
+            subject_images_list[sub_id] = {'imageList': [os.path.join(test_image_directory_path, image)
+                                                         for image in data_frame['imageName'].tolist()],
+                                           'value': sub_sub_similarity_pairs[sub_id]}
+            count += 1
+            if count == 3:
+                break
 
-        #take the similarity values from sub_sub_list tuple
+        misc.plot_similar_images(subject_images_list, subject_subject_similarity=True)
+
+
+
