@@ -24,7 +24,7 @@ class FeaturesImages:
         self.split_windows = False
         self.model = None
         if self.model_name == 'LBP':
-            self.model = LBP.LocalBinaryPatterns(8, 2)
+            self.model = LBP.LocalBinaryPatterns(8, 1)
             self.split_windows = True
         elif self.model_name == 'HOG':
             self.model = HOG.Hog(orientations=9, pixels_per_cell=(8, 8), cells_per_block=(2, 2))
