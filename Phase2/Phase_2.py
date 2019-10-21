@@ -66,6 +66,9 @@ elif task == '4':
     decomposition_model = input("1.PCA\n2.SVD\n3.NMF\n4.LDA\nSelect decomposition: ")
     test_dataset_folder_path = os.path.abspath(
         os.path.join(Path(os.getcwd()).parent, test_dataset_path))
+    k = int(input("Please specify the number of components : "))
+    test_image_id = input("Please specify test image ID: ")
+    m = int(input("Please specify the value of m: "))
     images_list = list(misc.get_images_in_directory(test_dataset_folder_path).keys())
     metadata = Metadata(images_list)
     label = int(input("1.Left-Hand\n2.Right-Hand\n3.Dorsal\n4.Palmar\n"
@@ -82,20 +85,18 @@ elif task == '4':
         8: {"gender": "female"}
     }
 
-    metadata_images_list = metadata.get_specific_metadata_images_list(label_interpret_dict.get(label))
+    metadata_images_list = metadata.get_specific_metadata_images_list(
+        label_interpret_dict.get(label))
+    metadata_images_list.append(test_image_id)
     metadata_label = ''
     for key, value in label_interpret_dict.get(label).items():
         metadata_label = key + '_' + str(value)
-
-    k = int(input("Please specify the number of components : "))
     decomposition = Decomposition(decomposition_model, k, model, test_dataset_path,
                                   metadata_images_list=metadata_images_list, metadata_label=metadata_label)
 
     decomposition.dimensionality_reduction()
-    test_image_id = input("Please specify test image ID: ")
-    m = int(input("Please specify the value of m: "))
     pickle_file_path = model + "_" + decomposition_model + "_" + metadata_label
-    similarity = Similarity(model, test_image_id, m)
+    similarity = Similarity(model, test_image_id, m+1)
     similarity.get_similar_images(test_dataset_path, decomposition=decomposition, reduced_dimension=True,
                                   metadata_pickle=pickle_file_path)
 

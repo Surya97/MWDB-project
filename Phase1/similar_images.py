@@ -17,7 +17,7 @@ class Similarity:
         self.test_image_id = test_image_id
         self.k = k
 
-    def set_test_image_id(self,test_image_id):
+    def set_test_image_id(self, test_image_id):
         self.test_image_id = test_image_id
 
     def get_similar_images(self, test_folder=None, decomposition=None, reduced_dimension=False,
@@ -39,8 +39,9 @@ class Similarity:
         model = features_images.get_model()
         ranking = {}
         for image_id, feature_vector in tqdm(dataset_images_features.items()):
-            distance = model.similarity_fn(test_image_features, feature_vector)
-            ranking[image_id] = distance
+            if image_id != self.test_image_id:
+                distance = model.similarity_fn(test_image_features, feature_vector)
+                ranking[image_id] = distance
 
         sorted_results = collections.OrderedDict(sorted(ranking.items(), key=lambda val: val[1],
                                                         reverse=model.reverse_sort))
