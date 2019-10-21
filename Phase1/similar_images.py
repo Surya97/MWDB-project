@@ -73,7 +73,7 @@ class Similarity:
             test_image_features = features_images.compute_image_features(test_image_path)
             dataset_images_features = misc.load_from_pickle(os.path.dirname(__file__),feature)
             return test_image_features, dataset_images_features
-
+            # return dataset_images_features[self.test_image_id], dataset_images_features
         else:
             feature = self.model_name
             reduced_dimension_pickle_path = os.path.join(Path(os.path.dirname(__file__)).parent,

@@ -28,7 +28,7 @@ def reduce_subject_dim(subject_map):
         database_matrix.append(row)
 
     # TO-DO CHANGE THE VALUE OF MAX_LATENT
-    pcaobj = PCAModel(database_matrix, 24, '')
+    pcaobj = PCAModel(database_matrix, 10, '')
     pcaobj.decompose()
     return pcaobj.get_decomposed_data_matrix()
 
@@ -112,7 +112,7 @@ class Metadata:
         for sub2 in tqdm(sub_ids_list):
             if sub1!=sub2:
                 sub_sub_val = self.subject_subject_similarity(subject_map[sub1], subject_map[sub2],
-                                                          dataset_images_features)
+                                                          dataset_images_features, is_single_subject=True)
                 similarity_list_of_pair.append(tuple([sub2, sub_sub_val]))
 
         similarity_list_of_pair = similarity_list_of_pair[1:]
@@ -152,7 +152,8 @@ class Metadata:
                     similarity_row = similarity_row + [0]
                 else:
                     sub_sub_val = self.subject_subject_similarity(subject_map[sub1],subject_map[sub2], dataset_images_features)
-                    similarity_row = similarity_row + sub_sub_val
+                    # print(sub_sub_val)
+                    similarity_row = similarity_row + [sub_sub_val]
 
             similarity_matrix.append(similarity_row)
 
@@ -167,16 +168,26 @@ class Metadata:
 
         return similarity_matrix
 
-    def subject_subject_similarity(self,data_frame1,data_frame2, dataset_images_features):
+    def subject_subject_similarity(self,data_frame1,data_frame2, dataset_images_features, is_single_subject=False):
 
         similarity_val = 0
 
         subject1_map = self.sub_16_map(data_frame1, dataset_images_features)
         subject2_map = self.sub_16_map(data_frame2, dataset_images_features)
+        if is_single_subject:
+            subject1_db_matrix = reduce_subject_dim(subject1_map)
+            subject2_db_matrix = reduce_subject_dim(subject2_map)
+        else:
+            subject1_db_matrix = []
+            subject2_db_matrix = []
+            for key, value in subject1_map.items():
+                subject1_db_matrix.append(value)
 
-        subject1_db_matrix = reduce_subject_dim(subject1_map)
-        subject2_db_matrix = reduce_subject_dim(subject2_map)
+            for key, value in subject2_map.items():
+                subject2_db_matrix.append(value)
 
+        # print(subject1_db_matrix)
+        # print(subject2_db_matrix)
         for i in range(16):
             similarity_val += euclidean_distance(subject1_db_matrix[i], subject2_db_matrix[i])
 
@@ -357,10 +368,10 @@ class Metadata:
                     min_val = len(feature_vector)
                 total = total + len(feature_vector)
                 images_num = images_num + 1
-        n_clusters = min(total, 300)
+        n_clusters = min(total, 70)
 
         if n_clusters != 0:
-            kmeans = MiniBatchKMeans(n_clusters, random_state=42)
+            kmeans = MiniBatchKMeans(n_clusters, random_state=42, max_iter=10)
             kmeans.fit(input_k_means)
         else:
             one_keypoint = [[0] * 128]

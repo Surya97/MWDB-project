@@ -127,7 +127,7 @@ class FeaturesImages:
             images_num = images_num + 1
 
         # n_clusters = int(sum / images_num)
-        n_clusters = 300
+        n_clusters = 70
         # int(sum / images_num) #taking so much time - better to fix some value
         kmeans = MiniBatchKMeans(n_clusters, random_state=42)
         kmeans.fit(input_k_means)

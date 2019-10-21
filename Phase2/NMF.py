@@ -1,5 +1,6 @@
 from sklearn.decomposition import NMF
-from sklearn.preprocessing import scale
+from time import perf_counter as pc
+from sklearn.preprocessing import MaxAbsScaler
 import numpy as np
 
 '''
@@ -11,7 +12,7 @@ class NMFModel:
     def __init__(self, database_matrix, k_components, image_list):
         self.database_matrix = database_matrix
         self.k_components = k_components
-        self.nmf = NMF(init='random', random_state=23)
+        self.nmf = NMF(init='random', random_state=0, verbose=True, max_iter=20)
         self.database_image_list = image_list
         self.w = None
         self.h = None
@@ -22,8 +23,13 @@ class NMFModel:
     '''
 
     def decompose(self):
-        # scaled_feature_matrix = scale(self.database_matrix, axis=1)
-        self.w = self.nmf.fit_transform(self.database_matrix)
+        scaler = MaxAbsScaler()
+        scaled_feature_matrix = scaler.fit_transform(self.database_matrix)
+        print("Starting decompose")
+        start_time = pc()
+        self.w = self.nmf.fit_transform(scaled_feature_matrix)
+        end_time = pc()
+        print("Time elapsed", end_time-start_time)
         self.h = self.nmf.components_
         self.reduced_database_matrix = self.w
         self.get_decomposed_data_matrix()

@@ -30,7 +30,7 @@ class LocalBinaryPatterns:
         # x = itemfreq(lbp.ravel())
         # hist = x[:, 1]/sum(x[:, 1])
         vecimgLBP = lbp.flatten()
-        hist, hist_edges = np.histogram(vecimgLBP, bins=256)
+        hist, hist_edges = np.histogram(vecimgLBP, bins=10)
         return hist
 
 
