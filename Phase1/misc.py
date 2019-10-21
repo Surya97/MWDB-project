@@ -78,21 +78,26 @@ def load_from_pickle(path, feature=None, k=-1):
 def plot_similar_images(plot_images_dict, subject_subject_similarity=False):
 
     if subject_subject_similarity:
-        n_rows = 3
-        temp_sub_item = plot_images_dict.items()[0]
-        n_cols = len(temp_sub_item[1]['imageList'])
+        n_cols = 6
+        for key, value in plot_images_dict.items():
+            temp_sub_item = key
+            n_images = len(plot_images_dict[temp_sub_item]['imageList'])
+            break
         count = 0
+        n_rows = int(math.ceil((4*n_images) / n_cols))
         gs = gridspec.GridSpec(n_rows, n_cols)
         fig = plt.figure()
         for subject, info in plot_images_dict.items():
             images_list = info['imageList']
-            similarity_string = str(info['value'])
-            for i in range(images_list):
-                ax = fig.add_subplot(gs[i])
+            for i in range(len(images_list)):
+                ax = fig.add_subplot(gs[count])
                 image = read_image(images_list[i])
                 im = ax.imshow(image, cmap='Greys_r')
                 ax.axis('off')
+                similarity_string = 'Subject: ' + str(subject) + '\nImage: ' +\
+                                    os.path.basename(images_list[i]) + '\n' + str(info['value'])
                 ax.text(x=0.5, y=-0.1, s=similarity_string, verticalalignment='bottom', horizontalalignment='center')
+                count += 1
 
     else:
         plots = len(list(plot_images_dict))

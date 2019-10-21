@@ -180,7 +180,7 @@ class Metadata:
         for i in range(16):
             similarity_val += euclidean_distance(subject1_db_matrix[i], subject2_db_matrix[i])
 
-        return [round(similarity_val, 3)]
+        return round(similarity_val, 3)
 
     def get_binary_image_metadata(self):
 
@@ -357,7 +357,7 @@ class Metadata:
                     min_val = len(feature_vector)
                 total = total + len(feature_vector)
                 images_num = images_num + 1
-        n_clusters = 300
+        n_clusters = min(total, 300)
 
         if n_clusters != 0:
             kmeans = MiniBatchKMeans(n_clusters, random_state=42)
@@ -390,16 +390,16 @@ class Metadata:
         subject_images_list = {}
         count = 0
         for sub_id, data_frame in subject_map.items():
-            if sub_id == main_subject :
+            if sub_id == main_subject:
                 subject_images_list[sub_id] = {'imageList': [os.path.join(test_image_directory_path, image)
                                                              for image in data_frame['imageName'].tolist()],
                                                'value': 0}
-            else :
+            else:
                 subject_images_list[sub_id] = {'imageList': [os.path.join(test_image_directory_path, image)
-                                                         for image in data_frame['imageName'].tolist()],
-                                           'value': sub_sub_similarity_pairs[sub_id]}
+                                                             for image in data_frame['imageName'].tolist()],
+                                               'value': sub_sub_similarity_pairs[sub_id]}
             count += 1
-            if count == 3:
+            if count > 3:
                 break
 
         misc.plot_similar_images(subject_images_list, subject_subject_similarity=True)
