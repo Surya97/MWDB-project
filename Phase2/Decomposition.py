@@ -11,7 +11,7 @@ from LDA import LDAModel
 
 
 class Decomposition:
-    def __init__(self, decomposition_name, k_components, feature_extraction_model_name, test_folder_path,
+    def __init__(self, decomposition_name='', k_components=10, feature_extraction_model_name=None, test_folder_path=None,
                  metadata_images_list=None, metadata_label=None):
         self.decomposition_name = decomposition_name
         self.k_components = k_components

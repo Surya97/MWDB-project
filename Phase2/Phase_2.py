@@ -166,6 +166,7 @@ elif task == '7':
     k = int(input("Enter the number of latent features to consider: "))
     test_dataset_folder_path = os.path.abspath(
         os.path.join(Path(os.getcwd()).parent, test_dataset_path))
+    decomposition = Decomposition(feature_extraction_model_name='SIFT', test_folder_path=test_dataset_folder_path)
     images_list = list(misc.get_images_in_directory(test_dataset_folder_path).keys())
     metadata = Metadata(images_list)
     sub_sub_matrix = metadata.subject_matrix()

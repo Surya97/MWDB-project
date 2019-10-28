@@ -12,7 +12,7 @@ class NMFModel:
     def __init__(self, database_matrix, k_components, image_list):
         self.database_matrix = database_matrix
         self.k_components = k_components
-        self.nmf = NMF(init='random', random_state=0, verbose=True, max_iter=20)
+        self.nmf = NMF(n_components=self.k_components, init='random', random_state=0, verbose=True, max_iter=20)
         self.database_image_list = image_list
         self.w = None
         self.h = None
