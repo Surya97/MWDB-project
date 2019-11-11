@@ -9,6 +9,7 @@ from pathlib import Path
 from Decomposition import Decomposition
 from Metadata import Metadata
 
+
 class KMeans:
     def __init__(self, k, tolerance=0.001, max_iter=300, test_dataset_path=''):
         self.k = k
@@ -19,12 +20,14 @@ class KMeans:
         self.dorsal_features = {}
         self.palmar_features = {}
         self.reduced_pickle_file_folder = os.path.join(Path(os.path.dirname(__file__)).parent,
-                                                         'Phase2', 'pickle_files')
+                                                       'Phase2', 'pickle_files')
         self.test_dataset_path = test_dataset_path
+        self.image_cluster_map = dict()
+        self.image_list = []
 
     def set_label_features(self):
 
-        if not (os.path.exists(os.path.join(self.reduced_pickle_file_folder,'LBP_PCA.pkl'))):
+        if not (os.path.exists(os.path.join(self.reduced_pickle_file_folder, 'LBP_PCA.pkl'))):
             print('Pickle file not found for the Particular (model,Reduction)')
             print('Runnning Task1 Of Phase2 for the Particular (model,Reduction) to get the pickle file')
             decomposition = Decomposition('PCA', 30, 'LBP', self.test_dataset_path)
@@ -32,7 +35,6 @@ class KMeans:
 
         self.dorsal_features = self.get_label_features('dorsal')
         self.palmar_features = self.get_label_features('palmar')
-
 
     def get_label_features(self, label):
 
@@ -50,19 +52,25 @@ class KMeans:
     def fit(self, data):
         self.centroids = {}
 
+        self.image_list = data.keys()
+        features = list(data.values())
+
         for i in range(self.k):
-            self.centroids[i] = data[i]
+            self.centroids[i] = features[i]
+            self.image_cluster_map[self.image_list[i]] = i
 
         for i in tqdm(range(self.max_iter)):
             self.classifications = {}
 
-            for feature in data:
+            for j in range(len(features)):
+                feature = features[j]
                 dists = [np.linalg.norm(feature-self.centroids[centroid]) for centroid in self.centroids]
                 classification = dists.index(min(dists))
                 if classification in self.classifications:
                     self.classifications[classification].append(feature)
                 else:
                     self.classifications[classification] = [feature]
+                self.image_cluster_map[self.image_list[j]] = classification
 
             prev_centroids = dict(self.centroids)
 
