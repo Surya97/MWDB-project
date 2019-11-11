@@ -4,23 +4,47 @@ from tqdm import tqdm
 import numpy as np
 import misc
 import os
-from Path import Path
-
+from pathlib import Path
+from Decomposition import Decomposition
+from Metadata import Metadata
 
 class KMeans:
-    def __init__(self, k, tolerance=0.001, max_iter=300):
+    def __init__(self, k, tolerance=0.001, max_iter=300, test_dataset_path=''):
         self.k = k
         self.tolerance = tolerance
         self.max_iter = max_iter
         self.centroids = {}
         self.classifications = {}
         self.dorsal_features = {}
-        self.palmer_features = {}
-        self.reduced_pickle_file_folder = os.path.join(os.path.dirname(__file__), 'pickle_files')
+        self.palmar_features = {}
+        self.reduced_pickle_file_folder = os.path.join(Path(os.path.dirname(__file__)).parent,
+                                                         'Phase2', 'pickle_files')
+        self.test_dataset_path = test_dataset_path
 
-    def get_features_pickle_file(self):
-        self.dorsal_features = misc.load_from_pickle(self.reduced_pickle_file_folder, 'LBP_PCA')
-        self.palmer_features = misc.load_from_pickle(self.reduced_pickle_file_folder, 'LBP_PCA')
+    def set_label_features(self):
+
+        if not (os.path.exists(os.path.join(self.reduced_pickle_file_folder,'LBP_PCA.pkl'))):
+            print('Pickle file not found for the Particular (model,Reduction)')
+            print('Runnning Task1 Of Phase2 for the Particular (model,Reduction) to get the pickle file')
+            decomposition = Decomposition('PCA', 30, 'LBP', self.test_dataset_path)
+            decomposition.dimensionality_reduction()
+
+        self.dorsal_features = self.get_label_features('dorsal')
+        self.palmar_features = self.get_label_features('palmar')
+
+
+    def get_label_features(self, label):
+
+        if not (os.path.exists(os.path.join(self.reduced_pickle_file_folder, 'LBP_PCA_'+label+'.pkl'))):
+            test_dataset_folder_path = os.path.abspath(
+                os.path.join(Path(os.getcwd()).parent, self.test_dataset_path))
+            images_list = list(misc.get_images_in_directory(test_dataset_folder_path).keys())
+            metadata = Metadata(images_list)
+            metadata.save_label_decomposed_features(label)
+
+        features = misc.load_from_pickle(self.reduced_pickle_file_folder, 'LBP_PCA_'+label)
+
+        return features
 
     def fit(self, data):
         self.centroids = {}

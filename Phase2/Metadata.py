@@ -416,4 +416,29 @@ class Metadata:
         misc.plot_similar_images(subject_images_list, subject_subject_similarity=True)
 
 
+    def save_label_decomposed_features(self, label):
+        features = misc.load_from_pickle(self.reduced_dimension_pickle_path, 'LBP_PCA')
 
+        if self.images_metadata is None:
+            self.set_images_metadata()
+
+        filtered_images_metadata = self.images_metadata
+
+        if self.test_images_list is not None:
+            filtered_images_metadata = filtered_images_metadata[
+                (filtered_images_metadata['imageName'].isin(self.test_images_list))]
+
+        filtered_images_metadata = filtered_images_metadata[
+            (filtered_images_metadata['aspectOfHand'].str.contains(label))]
+
+        images_list = filtered_images_metadata['imageName'].tolist()
+
+        label_features_dict = {}
+
+        for image_id in images_list:
+            label_features_dict[image_id] = features[image_id]
+
+
+        misc.save2pickle(label_features_dict, self.reduced_dimension_pickle_path,
+                         feature=('LBP_PCA_' + label))
+        return
