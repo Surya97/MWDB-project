@@ -110,3 +110,31 @@ class Similarity:
 
         return similarity_value
 
+    def get_similar_image_ids(self, test_folder=None, decomposition=None, reduced_dimension=False,
+                           metadata_pickle=None):
+        test_folder_path = os.path.join(Path(os.path.dirname(__file__)).parent, test_folder)
+        test_image_path = os.path.join(test_folder_path, self.test_image_id)
+        try:
+            # Image is present
+            misc.read_image(test_image_path)
+        except FileNotFoundError:
+            print('ImageId is not in the folder specified.')
+            return
+
+        test_image_features, dataset_images_features = self.get_database_image_features(test_folder, decomposition,
+                                                                                        reduced_dimension,
+                                                                                        metadata_pickle)
+        test_folder_path = os.path.join(Path(os.path.dirname(__file__)).parent, test_folder)
+        features_images = FeaturesImages(self.model_name)
+        model = features_images.get_model()
+        ranking = {}
+        for image_id, feature_vector in tqdm(dataset_images_features.items()):
+            if image_id != self.test_image_id:
+                distance = model.similarity_fn(test_image_features, feature_vector)
+                ranking[image_id] = distance
+
+        sorted_results = collections.OrderedDict(sorted(ranking.items(), key=lambda val: val[1],
+                                                        reverse=model.reverse_sort))
+        top_k_items = {item: sorted_results[item] for item in list(sorted_results)[:self.k + 1]}
+
+        return top_k_items.keys()[1:]

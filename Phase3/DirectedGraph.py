@@ -58,7 +58,7 @@ if __name__ == "__main__":
     print(graph.edges())
 
     print("Add an edge:")
-    graph.add_edge({"5", "6"})
+    graph.add_edge(["5", "6"])
 
     print("Vertices of graph:")
     print(graph.vertices())
