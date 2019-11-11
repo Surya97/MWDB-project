@@ -1,5 +1,10 @@
+import sys
+sys.path.insert(1, '../Phase1')
 from tqdm import tqdm
 import numpy as np
+import misc
+import os
+from Path import Path
 
 
 class KMeans:
@@ -9,6 +14,13 @@ class KMeans:
         self.max_iter = max_iter
         self.centroids = {}
         self.classifications = {}
+        self.dorsal_features = {}
+        self.palmer_features = {}
+        self.reduced_pickle_file_folder = os.path.join(os.path.dirname(__file__), 'pickle_files')
+
+    def get_features_pickle_file(self):
+        self.dorsal_features = misc.load_from_pickle(self.reduced_pickle_file_folder, 'LBP_PCA')
+        self.palmer_features = misc.load_from_pickle(self.reduced_pickle_file_folder, 'LBP_PCA')
 
     def fit(self, data):
         self.centroids = {}
