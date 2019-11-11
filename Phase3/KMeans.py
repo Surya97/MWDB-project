@@ -1,5 +1,6 @@
 import sys
 sys.path.insert(1, '../Phase1')
+sys.path.insert(2, '../Phase2')
 from tqdm import tqdm
 import numpy as np
 import misc
