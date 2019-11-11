@@ -60,6 +60,7 @@ class KMeans:
             self.image_cluster_map[self.image_list[i]] = i
 
         for i in tqdm(range(self.max_iter)):
+            print('iteration', i)
             self.classifications = {}
 
             for j in range(len(features)):
@@ -95,3 +96,5 @@ class KMeans:
         classification = dists.index(min(dists))
         return classification
 
+    def get_image_cluster_map(self):
+        return self.image_cluster_map
