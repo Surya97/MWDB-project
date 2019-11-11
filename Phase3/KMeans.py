@@ -52,7 +52,7 @@ class KMeans:
     def fit(self, data):
         self.centroids = {}
 
-        self.image_list = data.keys()
+        self.image_list = list(data.keys())
         features = list(data.values())
 
         for i in range(self.k):
@@ -87,6 +87,7 @@ class KMeans:
                     optimized = False
 
             if optimized:
+                print(self.image_cluster_map)
                 break
 
     def predict(self, data):
