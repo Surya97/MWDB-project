@@ -94,7 +94,7 @@ class KMeans:
     def predict(self, data):
         dists = [np.linalg.norm(data - self.centroids[centroid]) for centroid in self.centroids]
         classification = dists.index(min(dists))
-        return classification
+        return min(dists), classification
 
     def get_image_cluster_map(self):
         return self.image_cluster_map
