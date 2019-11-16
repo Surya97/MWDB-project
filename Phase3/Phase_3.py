@@ -11,12 +11,12 @@ if task == '2':
     c = int(input("Enter the Number Of Clusters:"))
     labelled_dataset_path = 'Data/testdata'
     unlabelled_dataset_path = 'Data/testdata'
-    x = KMeans(5, labelled_dataset_path=labelled_dataset_path, unlabelled_dataset_path=unlabelled_dataset_path )
+    x = KMeans(5, labeled_dataset_path=labelled_dataset_path, unlabeled_dataset_path=unlabelled_dataset_path )
     x.set_label_features()
     x.fit(x.get_label_features('dorsal'))
-    similarity_val1 = x.get_similarity_val(labelled_dataset_path)
-    x.fit(x.get_label_features('palmar'))
-    similarity_val2 = x.get_similarity_val(unlabelled_dataset_path)
+    similarity_val1 = x.get_similarity_val(unlabelled_dataset_path)
+    #x.fit(x.get_label_features('palmar'))
+    #similarity_val2 = x.get_similarity_val(unlabelled_dataset_path)
 
 
 

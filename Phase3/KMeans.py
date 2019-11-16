@@ -10,6 +10,9 @@ from Decomposition import Decomposition
 from Metadata import Metadata
 from features_images import FeaturesImages
 
+def euclidean_distance(dist1, dist2):
+    return (sum([(a-b)**2 for a,b in zip(dist1, dist2)]))**0.5
+
 class KMeans:
     def __init__(self, k, tolerance=0.001, max_iter=300, labeled_dataset_path='', unlabeled_dataset_path= ''):
         self.k = k
@@ -26,7 +29,7 @@ class KMeans:
         self.image_cluster_map = dict()
         self.image_list = []
         self.decomposition = None
-        self.unlabeled_dataset_features={}
+
 
     def set_label_features(self):
 
@@ -35,7 +38,9 @@ class KMeans:
             print('Runnning Task1 Of Phase2 for the Particular (model,Reduction) to get the pickle file')
             self.decomposition = Decomposition('PCA', 30, 'LBP', self.labeled_dataset_path)
             self.decomposition.dimensionality_reduction()
-            self.unlabeled_dataset_features = self.get_unlabeled_images_decomposed_features(self.unlabeled_dataset_path)
+            unlabeled_dataset_features = self.get_unlabeled_images_decomposed_features(self.unlabeled_dataset_path)
+            misc.save2pickle(unlabeled_dataset_features, self.reduced_pickle_file_folder,
+                             feature=('unlabeled_LBP_PCA'))
 
 
         self.dorsal_features = self.get_label_features('dorsal')
@@ -107,7 +112,21 @@ class KMeans:
         return self.image_cluster_map
 
     def get_similarity_val(self, unlabeled_dataset_path):
-       print()
+       self.fit(self.dorsal_features)
+       similarity_value_unlabeledimages={}
+       labeled_dataset_features=self.dorsal_features
+       unlabeled_dataset_features = misc.load_from_pickle(self.reduced_pickle_file_folder, 'unlabeled_LBP_PCA')
+       for unlabeled_image_id, feature in unlabeled_dataset_features.items():
+           similarity_val = 0
+           count = 0
+           dist, unlabeled_cluster_number = self.predict(feature)
+           for labeled_image_id, labeled_cluster_number in self.image_cluster_map.items():
+                if unlabeled_cluster_number == labeled_cluster_number:
+                    similarity_val+=euclidean_distance(feature, labeled_dataset_features[labeled_image_id])
+                    count+=1
+           similarity_value_unlabeledimages[unlabeled_image_id]=(similarity_val/count)
+
+       return similarity_value_unlabeledimages
 
 
     def get_unlabeled_images_decomposed_features(self, unlabeled_dataset_path):
@@ -120,11 +139,13 @@ class KMeans:
             test_folder_path = os.path.join(Path(os.path.dirname(__file__)).parent, unlabeled_dataset_path)
             features_images = FeaturesImages('LBP', test_folder_path)
             test_image_path = os.path.join(test_folder_path, image_id)
-            test_image_features = features_images.compute_image_features(test_image_path)
+            test_image_features = list()
+            test_image_features.append(features_images.compute_image_features(test_image_path))
 
             unlabeled_image_decomposed_features = self.decomposition.decomposition_model.get_new_image_features_in_latent_space(
                 test_image_features)
 
             images_decomposed_features[image_id] = unlabeled_image_decomposed_features
+
 
         return images_decomposed_features
