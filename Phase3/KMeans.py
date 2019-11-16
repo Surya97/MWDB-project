@@ -8,10 +8,10 @@ import os
 from pathlib import Path
 from Decomposition import Decomposition
 from Metadata import Metadata
-
+from features_images import FeaturesImages
 
 class KMeans:
-    def __init__(self, k, tolerance=0.001, max_iter=300, test_dataset_path=''):
+    def __init__(self, k, tolerance=0.001, max_iter=300, labeled_dataset_path='', unlabeled_dataset_path= ''):
         self.k = k
         self.tolerance = tolerance
         self.max_iter = max_iter
@@ -19,19 +19,24 @@ class KMeans:
         self.classifications = {}
         self.dorsal_features = {}
         self.palmar_features = {}
+        self.unlabeled_dataset_path = unlabeled_dataset_path
         self.reduced_pickle_file_folder = os.path.join(Path(os.path.dirname(__file__)).parent,
                                                        'Phase2', 'pickle_files')
-        self.test_dataset_path = test_dataset_path
+        self.labeled_dataset_path = labeled_dataset_path
         self.image_cluster_map = dict()
         self.image_list = []
+        self.decomposition = None
+        self.unlabeled_dataset_features={}
 
     def set_label_features(self):
 
         if not (os.path.exists(os.path.join(self.reduced_pickle_file_folder, 'LBP_PCA.pkl'))):
             print('Pickle file not found for the Particular (model,Reduction)')
             print('Runnning Task1 Of Phase2 for the Particular (model,Reduction) to get the pickle file')
-            decomposition = Decomposition('PCA', 30, 'LBP', self.test_dataset_path)
-            decomposition.dimensionality_reduction()
+            self.decomposition = Decomposition('PCA', 30, 'LBP', self.labeled_dataset_path)
+            self.decomposition.dimensionality_reduction()
+            self.unlabeled_dataset_features = self.get_unlabeled_images_decomposed_features(self.unlabeled_dataset_path)
+
 
         self.dorsal_features = self.get_label_features('dorsal')
         self.palmar_features = self.get_label_features('palmar')
@@ -40,10 +45,11 @@ class KMeans:
 
         if not (os.path.exists(os.path.join(self.reduced_pickle_file_folder, 'LBP_PCA_'+label+'.pkl'))):
             test_dataset_folder_path = os.path.abspath(
-                os.path.join(Path(os.getcwd()).parent, self.test_dataset_path))
+                os.path.join(Path(os.getcwd()).parent, self.labeled_dataset_path))
             images_list = list(misc.get_images_in_directory(test_dataset_folder_path).keys())
             metadata = Metadata(images_list)
             metadata.save_label_decomposed_features(label)
+
 
         features = misc.load_from_pickle(self.reduced_pickle_file_folder, 'LBP_PCA_'+label)
 
@@ -54,6 +60,7 @@ class KMeans:
 
         self.image_list = list(data.keys())
         features = list(data.values())
+        self.image_cluster_map = dict()
 
         for i in range(self.k):
             self.centroids[i] = features[i]
@@ -98,3 +105,26 @@ class KMeans:
 
     def get_image_cluster_map(self):
         return self.image_cluster_map
+
+    def get_similarity_val(self, unlabeled_dataset_path):
+       print()
+
+
+    def get_unlabeled_images_decomposed_features(self, unlabeled_dataset_path):
+        test_dataset_folder_path = os.path.abspath(
+            os.path.join(Path(os.getcwd()).parent, self.labeled_dataset_path))
+        images_list = list(misc.get_images_in_directory(test_dataset_folder_path).keys())
+
+        images_decomposed_features = {}
+        for image_id in images_list:
+            test_folder_path = os.path.join(Path(os.path.dirname(__file__)).parent, unlabeled_dataset_path)
+            features_images = FeaturesImages('LBP', test_folder_path)
+            test_image_path = os.path.join(test_folder_path, image_id)
+            test_image_features = features_images.compute_image_features(test_image_path)
+
+            unlabeled_image_decomposed_features = self.decomposition.decomposition_model.get_new_image_features_in_latent_space(
+                test_image_features)
+
+            images_decomposed_features[image_id] = unlabeled_image_decomposed_features
+
+        return images_decomposed_features
