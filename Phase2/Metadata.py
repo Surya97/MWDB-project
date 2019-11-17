@@ -12,7 +12,6 @@ from PCA import PCAModel
 from tqdm import tqdm
 
 
-
 def euclidean_distance(dist1, dist2):
     return (sum([(a-b)**2 for a, b in zip(dist1, dist2)]))**0.5
 
@@ -415,7 +414,6 @@ class Metadata:
 
         misc.plot_similar_images(subject_images_list, subject_subject_similarity=True)
 
-
     def save_label_decomposed_features(self, label):
         features = misc.load_from_pickle(self.reduced_dimension_pickle_path, 'LBP_PCA')
 
@@ -437,7 +435,6 @@ class Metadata:
 
         for image_id in images_list:
             label_features_dict[image_id] = features[image_id]
-
 
         misc.save2pickle(label_features_dict, self.reduced_dimension_pickle_path,
                          feature=('LBP_PCA_' + label))
