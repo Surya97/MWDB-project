@@ -58,7 +58,6 @@ class LabelFeatures:
             os.path.join(Path(os.getcwd()).parent, self.unlabelled_dataset_path))
         images_list = list(misc.get_images_in_directory(test_dataset_folder_path).keys())
         images_decomposed_features = {}
-        print("Decomposition name", self.decomposition.decomposition_name)
         for image_id in images_list:
             features_images = FeaturesImages('LBP', test_dataset_folder_path)
             test_image_path = os.path.join(test_dataset_folder_path, image_id)
