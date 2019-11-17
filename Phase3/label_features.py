@@ -10,28 +10,28 @@ from features_images import FeaturesImages
 
 
 class LabelFeatures:
-    def __init__(self, labeled_dataset_path='', unlabeled_dataset_path=''):
-        self.labeled_dataset_path = labeled_dataset_path
-        self.unlabeled_dataset_path = unlabeled_dataset_path
+    def __init__(self, labelled_dataset_path='', unlabelled_dataset_path=''):
+        self.labelled_dataset_path = labelled_dataset_path
+        self.unlabelled_dataset_path = unlabelled_dataset_path
         self.reduced_pickle_file_folder = os.path.join(Path(os.path.dirname(__file__)).parent,
                                                        'Phase2', 'pickle_files')
         self.dorsal_features = None
         self.palmar_features = None
         self.decomposition = None
-        self.unlabeled_dataset_features = None
+        self.unlabelled_dataset_features = None
 
-    def get_unlabeled_dataset_features(self):
-        self.unlabeled_dataset_features = misc.load_from_pickle(self.reduced_pickle_file_folder, 'unlabeled_LBP_PCA')
-        return self.unlabeled_dataset_features
+    def get_unlabelled_dataset_features(self):
+        self.unlabelled_dataset_features = misc.load_from_pickle(self.reduced_pickle_file_folder, 'unlabelled_LBP_PCA')
+        return self.unlabelled_dataset_features
 
     def set_features(self):
         if not (os.path.exists(os.path.join(self.reduced_pickle_file_folder, 'LBP_PCA.pkl'))):
             print('Pickle file not available. Getting features....')
-            self.decomposition = Decomposition('PCA', 40, 'LBP', self.labeled_dataset_path)
+            self.decomposition = Decomposition('PCA', 40, 'LBP', self.labelled_dataset_path)
             self.decomposition.dimensionality_reduction()
-            self.unlabeled_dataset_features = self.get_unlabeled_images_decomposed_features(self.unlabeled_dataset_path)
-            misc.save2pickle(self.unlabeled_dataset_features, self.reduced_pickle_file_folder,
-                             feature='unlabeled_LBP_PCA')
+            self.unlabelled_dataset_features = self.get_unlabelled_images_decomposed_features()
+            misc.save2pickle(self.unlabelled_dataset_features, self.reduced_pickle_file_folder,
+                             feature='unlabelled_LBP_PCA')
         self.dorsal_features = self.get_features('dorsal')
         self.palmar_features = self.get_features('palmar')
 
@@ -48,7 +48,7 @@ class LabelFeatures:
     def get_features(self, label):
         if not (os.path.exists(os.path.join(self.reduced_pickle_file_folder, 'LBP_PCA_' + label + '.pkl'))):
             test_dataset_folder_path = os.path.abspath(
-                os.path.join(Path(os.getcwd()).parent, self.labeled_dataset_path))
+                os.path.join(Path(os.getcwd()).parent, self.labelled_dataset_path))
             images_list = list(misc.get_images_in_directory(test_dataset_folder_path).keys())
             metadata = Metadata(images_list)
             metadata.save_label_decomposed_features(label)
@@ -56,9 +56,9 @@ class LabelFeatures:
         features = misc.load_from_pickle(self.reduced_pickle_file_folder, 'LBP_PCA_'+label)
         return features
 
-    def get_unlabeled_images_decomposed_features(self):
+    def get_unlabelled_images_decomposed_features(self):
         test_dataset_folder_path = os.path.abspath(
-            os.path.join(Path(os.getcwd()).parent, self.unlabeled_dataset_path))
+            os.path.join(Path(os.getcwd()).parent, self.unlabelled_dataset_path))
         images_list = list(misc.get_images_in_directory(test_dataset_folder_path).keys())
         images_decomposed_features = {}
         for image_id in images_list:

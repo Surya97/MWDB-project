@@ -70,15 +70,15 @@ class KMeans:
     def get_image_cluster_map(self):
         return self.image_cluster_map
 
-    def get_similarity_val(self, labelled_dataset_features, unlabeled_dataset_features):
-        unlabeled_images_similarity = {}
-        for unlabeled_image_id, feature in unlabeled_dataset_features.items():
+    def get_similarity_val(self, labelled_dataset_features, unlabelled_dataset_features):
+        unlabelled_images_similarity = {}
+        for unlabelled_image_id, feature in unlabelled_dataset_features.items():
             similarity_val = 0
             count = 0
-            dist, unlabeled_cluster_number = self.predict(feature)
-            for labeled_image_id, labeled_cluster_number in self.image_cluster_map.items():
-                if unlabeled_cluster_number == labeled_cluster_number:
-                    similarity_val += euclidean_distance(feature, labelled_dataset_features[labeled_image_id])
+            dist, unlabelled_cluster_number = self.predict(feature)
+            for labelled_image_id, labelled_cluster_number in self.image_cluster_map.items():
+                if unlabelled_cluster_number == labelled_cluster_number:
+                    similarity_val += euclidean_distance(feature, labelled_dataset_features[labelled_image_id])
                     count += 1
-            unlabeled_images_similarity[unlabeled_image_id] = (similarity_val/count)
-        return unlabeled_images_similarity
+            unlabelled_images_similarity[unlabelled_image_id] = (similarity_val/count)
+        return unlabelled_images_similarity
