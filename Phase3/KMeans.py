@@ -1,7 +1,6 @@
 import sys
 sys.path.insert(1, '../Phase1')
 sys.path.insert(2, '../Phase2')
-from tqdm import tqdm
 import numpy as np
 
 
@@ -30,7 +29,7 @@ class KMeans:
             self.centroids[i] = features[i]
             self.image_cluster_map[self.image_list[i]] = i
 
-        for i in tqdm(range(self.max_iter)):
+        for i in range(self.max_iter):
             print('iteration', i)
             self.classifications = {}
 
