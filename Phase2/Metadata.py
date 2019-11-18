@@ -34,9 +34,12 @@ def reduce_subject_dim(subject_map):
 
 
 class Metadata:
-    def __init__(self, test_images_list=None):
+    def __init__(self, test_images_list=None, path=None):
         self.test_images_list = test_images_list
-        self.metadata_file_path = os.path.join(Path(os.path.dirname(__file__)).parent, 'data/HandInfo.csv')
+        if(path == None):
+            self.metadata_file_path = os.path.join(Path(os.path.dirname(__file__)).parent, 'data/HandInfo.csv')
+        else:
+            self.metadata_file_path = os.path.join(Path(os.path.dirname(__file__)).parent, path)
         self.reduced_dimension_pickle_path = os.path.join(Path(os.path.dirname(__file__)).parent,
                                                           'Phase2', 'pickle_files')
         self.unlabeled_image_features = None
@@ -50,7 +53,7 @@ class Metadata:
     def set_images_metadata(self):
         self.images_metadata = pd.read_csv(self.metadata_file_path)
 
-    def get_specific_metadata_images_list(self, feature_dict=None):
+    def get_specific_metadata_images_list(self, feature_dict=None, unlabled=False):
 
         if self.images_metadata is None:
             self.set_images_metadata()
@@ -71,9 +74,12 @@ class Metadata:
 
             gender = feature_dict.get('gender')
 
-            if aspect_of_hand:
+            if aspect_of_hand and unlabled==False:
                 filtered_images_metadata = filtered_images_metadata[
                     (filtered_images_metadata['aspectOfHand'].str.contains(aspect_of_hand))]
+                
+            if aspect_of_hand and unlabled:
+                filtered_images_metadata = filtered_images_metadata
 
             if accessories:
                 filtered_images_metadata = filtered_images_metadata[
