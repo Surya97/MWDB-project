@@ -34,9 +34,9 @@ def reduce_subject_dim(subject_map):
 
 
 class Metadata:
-    def __init__(self, test_images_list=None):
+    def __init__(self, test_images_list=None, metadatapath='data/HandInfo.csv'):
         self.test_images_list = test_images_list
-        self.metadata_file_path = os.path.join(Path(os.path.dirname(__file__)).parent, 'data/HandInfo.csv')
+        self.metadata_file_path = os.path.join(Path(os.path.dirname(__file__)).parent, metadatapath)
         self.reduced_dimension_pickle_path = os.path.join(Path(os.path.dirname(__file__)).parent,
                                                           'Phase2', 'pickle_files')
         self.unlabeled_image_features = None
@@ -442,3 +442,22 @@ class Metadata:
         misc.save2pickle(label_features_dict, self.reduced_dimension_pickle_path,
                          feature=('LBP_PCA_' + label))
         return
+
+    def getimagesdop_dict(self):
+        if self.images_metadata is None:
+            self.set_images_metadata()
+
+        filtered_images_metadata = self.images_metadata
+
+        # print('test_images_list', self.test_images_list)
+
+
+        images_list = filtered_images_metadata['imageName'].tolist()
+        aspect_of_hand_list = filtered_images_metadata['aspectOfHand'].tolist()
+
+        images_dop_dict = {}
+
+        for i in range(len(images_list)):
+            images_dop_dict[images_list[i]] = aspect_of_hand_list[i]
+
+        return images_dop_dict
