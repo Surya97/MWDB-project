@@ -24,27 +24,24 @@ class MyCustomLSH(object):
         self.number_of_hashes_per_layer = number_of_hashes_per_layer
         self.number_of_features = number_of_features
         self.generate_random_planes()
-        self._init_layers()
+        self.generate_layers()
 
     def generate_random_planes(self):
-        self.uniform_planes = [self._generate_uniform_planes()
-                                   for _ in range(self.num_layers)]
+        self.random_planes = [np.random.randn(self.number_of_hashes_per_layer, self.number_of_features)
+                              for _ in range(self.num_layers)]
 
-    def _init_layers(self):
+    def generate_layers(self):
         self.layers = [dict() for i in range(self.num_layers)]
 
-    def _generate_uniform_planes(self):
-        return np.random.randn(self.number_of_hashes_per_layer, self.number_of_features)
-
-    def get_hash_value(self, planes, input_point):
+    def get_combined_hash_value(self, planes, input_point):
         input_point = np.array(input_point)
         projections = np.dot(planes, input_point)
         return "".join(['1' if i > 0 else '0' for i in projections])
 
-    def add_to_index_structure(self, input_feature, extra_data=None, image_id=''):
+    def add_to_index_structure(self, input_feature, image_id=''):
         value = tuple(input_feature)
         for i, layer in enumerate(self.layers):
-            layer.setdefault(self.get_hash_value(self.uniform_planes[i], input_feature), []).append((value, image_id))
+            layer.setdefault(self.get_combined_hash_value(self.random_planes[i], input_feature), []).append((value, image_id))
 
     def query(self, feature, num_results=None, distance_func=None, image_id=''):
         candidates = set()
@@ -59,12 +56,12 @@ class MyCustomLSH(object):
             raise ValueError("The distance function name is invalid.")
 
         for i, layer in enumerate(self.layers):
-            binary_hash = self.get_hash_value(self.uniform_planes[i], feature)
+            binary_hash = self.get_combined_hash_value(self.random_planes[i], feature)
             candidates.update(layer.get(binary_hash, []))
 
         candidates = [(cand[0], cand[1], d_func(feature, np.asarray(cand[0])))
                       for cand in candidates]
-        candidates.sort(key=lambda x: x[2])
+        candidates.sort(key=lambda v: v[2])
         print('Query Image:', image_id)
         return candidates[:num_results] if num_results else candidates
 
