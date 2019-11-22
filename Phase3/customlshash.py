@@ -23,14 +23,8 @@ class MyCustomLSH(object):
         self.num_layers = num_layers
         self.number_of_hashes_per_layer = number_of_hashes_per_layer
         self.number_of_features = number_of_features
-        self.generate_random_planes()
-        self.generate_layers()
-
-    def generate_random_planes(self):
         self.random_planes = [np.random.randn(self.number_of_hashes_per_layer, self.number_of_features)
                               for _ in range(self.num_layers)]
-
-    def generate_layers(self):
         self.layers = [dict() for i in range(self.num_layers)]
 
     def get_combined_hash_value(self, planes, input_point):
