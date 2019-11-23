@@ -38,24 +38,24 @@ class MyCustomLSH(object):
             layer.setdefault(self.get_combined_hash_value(self.random_planes[i], input_feature), []).append((value, image_id))
 
     def query(self, feature, num_results=None, distance_func=None, image_id=''):
-        candidates = set()
+        image_hits = set()
         if not distance_func:
             distance_func = "euclidean"
 
         if distance_func == "euclidean":
-            d_func = euclidean_dist_square
+            calculate_distance = euclidean_dist_square
         elif distance_func == "true_euclidean":
-            d_func = euclidean_dist
+            calculate_distance = euclidean_dist
         else:
             raise ValueError("The distance function name is invalid.")
 
         for i, layer in enumerate(self.layers):
-            binary_hash = self.get_combined_hash_value(self.random_planes[i], feature)
-            candidates.update(layer.get(binary_hash, []))
+            combined_hash_value = self.get_combined_hash_value(self.random_planes[i], feature)
+            image_hits.update(layer.get(combined_hash_value, []))
 
-        candidates = [(cand[0], cand[1], d_func(feature, np.asarray(cand[0])))
-                      for cand in candidates]
-        candidates.sort(key=lambda v: v[2])
-        print('Query Image:', image_id)
-        return candidates[:num_results] if num_results else candidates
+        image_hits = [(hit_tuple[0], hit_tuple[1], calculate_distance(feature, np.asarray(hit_tuple[0])))
+                      for hit_tuple in image_hits]
+        image_hits.sort(key=lambda v: v[2])
+        
+        return image_hits[:num_results] if num_results else image_hits
 
