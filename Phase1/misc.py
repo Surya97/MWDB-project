@@ -118,3 +118,13 @@ def plot_similar_images(plot_images_dict, subject_subject_similarity=False):
             ax.text(x=0.5, y=-0.1, s=similarity_string, verticalalignment='bottom', horizontalalignment='center')
 
     plt.show()
+
+def getAccuracy(result, images_dop_dict):
+    count = 0
+    correct = 0
+
+    for image_id, aspectofHand in result.items():
+        if aspectofHand in images_dop_dict[image_id]:
+            correct = correct + 1
+        count = count + 1
+    return correct / count
