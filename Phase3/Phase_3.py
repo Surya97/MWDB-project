@@ -55,7 +55,7 @@ elif task == '4':
     palmar_features = label_features.get_label_features('palmar')
     unlabelled_features = label_features.get_unlabelled_images_decomposed_features()
     result = {}
-    if classifier == 'SVM':
+    if classifier == 'DT':
         decisiontree = DecisionTree()
         decisiontree.generate_input_data(dorsal_features, palmar_features)
         decisiontree.build_tree(decisiontree.dataset, 10, 1)
@@ -63,7 +63,7 @@ elif task == '4':
 
         for image_id, feature in unlabelled_features.items():
             feature = list(feature)
-            feature.append(0)
+            feature.append(None)
             val = decisiontree.predict(decisiontree, feature)
             if val == 0:
                 result[image_id]='dorsal'
