@@ -5,6 +5,7 @@ from KMeans import KMeans
 from label_features import LabelFeatures
 from Metadata import Metadata
 from customlshash import MyCustomLSH
+from DecisionTree import DecisionTree
 import pickle
 
 task = input("Please specify the task number: ")
@@ -42,8 +43,38 @@ if task == '2':
     images_dop_dict = metadata.getimagesdop_dict()
     print('Accuracy:', misc.getAccuracy(result, images_dop_dict))
 
-elif task == '3':
-    test_dataset_path = input("Enter test dataset path: ")
+elif task == '4':
+    classifier = input("1.SVM\n2.DT\n3.PPR\nSelect Classifier: ")
+    labelled_dataset_path = input('Enter labelled dataset path: ')
+    unlabelled_dataset_path = input('Enter unlabelled dataset path: ')
+
+    label_features = LabelFeatures(labelled_dataset_path=labelled_dataset_path,
+                                   unlabelled_dataset_path=unlabelled_dataset_path)
+    label_features.set_features()
+    dorsal_features = label_features.get_label_features('dorsal')
+    palmar_features = label_features.get_label_features('palmar')
+    unlabelled_features = label_features.get_unlabelled_images_decomposed_features()
+    result = {}
+    if classifier == 'SVM':
+        decisiontree = DecisionTree()
+        decisiontree.generate_input_data(dorsal_features, palmar_features)
+        decisiontree.build_tree(decisiontree.dataset, 10, 1)
+
+
+        for image_id, feature in unlabelled_features.items():
+            feature = list(feature)
+            feature.append(0)
+            val = decisiontree.predict(decisiontree, feature)
+            if val == 0:
+                result[image_id]='dorsal'
+            elif val == 1:
+                result[image_id]='palmar'
+
+    #ACCURACY
+    metadata = Metadata(metadatapath='Data/HandInfo.csv')
+    images_dop_dict = metadata.getimagesdop_dict()
+    print('Accuracy:', misc.getAccuracy(result, images_dop_dict))
+
 
 elif task == '5':
     num_layers = int(input("Enter the number Of Layers:"))
