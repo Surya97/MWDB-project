@@ -58,13 +58,13 @@ elif task == '4':
     if classifier == 'DT':
         decisiontree = DecisionTree()
         decisiontree.generate_input_data(dorsal_features, palmar_features)
-        decisiontree.build_tree(decisiontree.dataset, 10, 1)
+        dt = decisiontree.build_tree(decisiontree.dataset, 10, 1)
 
 
         for image_id, feature in unlabelled_features.items():
             feature = list(feature)
             feature.append(None)
-            val = decisiontree.predict(decisiontree, feature)
+            val = decisiontree.predict(dt, feature)
             if val == 0:
                 result[image_id]='dorsal'
             elif val == 1:
