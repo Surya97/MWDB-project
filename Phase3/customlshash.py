@@ -1,4 +1,9 @@
-
+import os
+import sys
+sys.path.insert(1, '../Phase1')
+sys.path.insert(2, '../Phase2')
+from pathlib import Path
+import misc
 import os
 import numpy as np
 wind_size = 5
@@ -37,7 +42,7 @@ class MyCustomLSH(object):
         for i, layer in enumerate(self.layers):
             layer.setdefault(self.get_combined_hash_value(self.random_planes[i], input_feature), []).append((value, image_id))
 
-    def query(self, feature, num_results=None, distance_func=None, image_id=''):
+    def query(self, feature, num_results=None, distance_func=None):
         image_hits = set()
         if not distance_func:
             distance_func = "euclidean"
@@ -57,5 +62,11 @@ class MyCustomLSH(object):
                       for hit_tuple in image_hits]
         image_hits.sort(key=lambda v: v[2])
         
-        return image_hits[:num_results] if num_results else image_hits
+        result = image_hits[:num_results] if num_results else image_hits
 
+        return result
+
+    def save_result(self, result):
+        reduced_pickle_file_folder = os.path.join(Path(os.path.dirname(__file__)).parent,
+                                                       'Phase2', 'pickle_files')
+        misc.save2pickle(result, reduced_pickle_file_folder, 'Task_5_Result')

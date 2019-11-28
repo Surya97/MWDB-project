@@ -6,6 +6,7 @@ from label_features import LabelFeatures
 from Metadata import Metadata
 from customlshash import MyCustomLSH
 from DecisionTree import DecisionTree
+from Feedback import Feedback
 import pickle
 
 task = input("Please specify the task number: ")
@@ -79,7 +80,7 @@ elif task == '4':
 elif task == '5':
     num_layers = int(input("Enter the number Of Layers:"))
     num_hashfunctions = int(input("Enter the number Of Hashes per layer:"))
-    image_id = input("Enter The ImageId:")
+    q_image_id = input("Enter The ImageId:")
     lsh = MyCustomLSH(number_of_hashes_per_layer =6, number_of_features =256, num_layers=5)
     final_path = '../Phase2/pickle_files/LBP_PCA_11k.pkl'
     print('loading from pickle file path', final_path)
@@ -91,7 +92,42 @@ elif task == '5':
     for image_id, feature in dataset_features.items():
         lsh.add_to_index_structure(input_feature =feature, image_id=image_id)
 
-    ret_val = lsh.query(dataset_features[image_id], image_id=image_id, num_results=20)
-    print('Query Image:', image_id, images_dop_dict[image_id])
+    ret_val = lsh.query(dataset_features[q_image_id], num_results=20)
+    print('Query Image:', q_image_id, images_dop_dict[q_image_id])
+    result = {}
     for val in ret_val:
-        print(val[1], images_dop_dict[val[1]])
+        result[val[1]] = val[2]
+        print(val[1], images_dop_dict[val[1]], val[2])
+
+    lsh.save_result(result)
+
+elif task == '6' :
+    r = int(input('Number Of Images you would like to label as Relevant:'))
+    ir = int(input('Number of Images you would like to label as Irrelevant:'))
+    final_path = '../Phase2/pickle_files/LBP_PCA_11k.pkl'
+    print('loading from pickle file path', final_path)
+    infile = open(final_path, 'rb')
+    dataset_features = pickle.load(infile)
+    feedback = Feedback()
+    task5_result = feedback.task5_result
+
+    num_image={}
+    count = 1
+    rorir_map = {}
+    for image_id, val in task5_result.items():
+        num_image[count]=image_id
+        print(count, image_id)
+        rorir_map[num_image[count]] = -1
+        count=count+1
+
+
+    while r>0:
+        ind = int(input('Enter the Image Number to Label as Relevant:'))
+        r= r-1
+        rorir_map[num_image[ind]]=1
+    while ir>0:
+        ind = int(input('Enter the Image Number to Label as Irrelevant:'))
+        ir= ir-1
+        rorir_map[num_image[ind]] = 0
+
+    print(rorir_map)
