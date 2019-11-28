@@ -81,6 +81,7 @@ elif task == '5':
     num_layers = int(input("Enter the number Of Layers:"))
     num_hashfunctions = int(input("Enter the number Of Hashes per layer:"))
     q_image_id = input("Enter The ImageId:")
+    t = int(input('Enter the Value of t:'))
     lsh = MyCustomLSH(number_of_hashes_per_layer =6, number_of_features =256, num_layers=5)
     final_path = '../Phase2/pickle_files/LBP_PCA_11k.pkl'
     print('loading from pickle file path', final_path)
@@ -92,7 +93,7 @@ elif task == '5':
     for image_id, feature in dataset_features.items():
         lsh.add_to_index_structure(input_feature =feature, image_id=image_id)
 
-    ret_val = lsh.query(dataset_features[q_image_id], num_results=20)
+    ret_val = lsh.query(dataset_features[q_image_id], num_results=t)
     print('Query Image:', q_image_id, images_dop_dict[q_image_id])
     result = {}
     for val in ret_val:
@@ -120,7 +121,6 @@ elif task == '6' :
         rorir_map[num_image[count]] = -1
         count=count+1
 
-
     while r>0:
         ind = int(input('Enter the Image Number to Label as Relevant:'))
         r= r-1
@@ -130,4 +130,11 @@ elif task == '6' :
         ir= ir-1
         rorir_map[num_image[ind]] = 0
 
-    print(rorir_map)
+    feedback.generate_input_data(rorir_map, dataset_features)
+    classifier = input("1.SVM\n2.DT\n3.PPR\n4.Prob\nSelect Classifier: ")
+    result = {}
+    
+    if classifier == 'DT':
+        decisiontree = DecisionTree()
+        decisiontree.dataset=feedback.dataset
+        dt = decisiontree.build_tree(decisiontree.dataset, 10, 1)
