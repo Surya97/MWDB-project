@@ -116,14 +116,14 @@ elif task == '6':
     feedback = Feedback()
     task5_result = feedback.task5_result
 
-    num_image={}
+    num_image = {}
     count = 1
     rorir_map = {}
     for image_id, val in task5_result.items():
-        num_image[count]=image_id
+        num_image[count] = image_id
         print(count, image_id)
         rorir_map[num_image[count]] = -1
-        count=count+1
+        count += 1
 
     while r > 0:
         ind = int(input('Enter the Image Number to Label as Relevant:'))
