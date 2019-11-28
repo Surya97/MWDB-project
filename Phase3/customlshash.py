@@ -17,6 +17,7 @@ def euclidean_dist_centred(x, y):
         diff = np.mean(x) - np.mean(y)
         return np.dot(diff, diff)
 
+
 class MyCustomLSH(object):
 
     def __init__(self, number_of_hashes_per_layer, number_of_features, num_layers=2):
