@@ -10,6 +10,7 @@ from Feedback import Feedback
 from visualize_clusters import VisualizeClusters
 import pickle
 import numpy as np
+from SVM import SVM
 
 task = input("Please specify the task number: ")
 
@@ -88,9 +89,22 @@ elif task == '4':
             feature.append(None)
             val = decisiontree.predict(dt, feature)
             if val == 0:
-                result[image_id]='dorsal'
+                result[image_id] = 'dorsal'
             elif val == 1:
-                result[image_id]='palmar'
+                result[image_id] = 'palmar'
+
+    if classifier == 'SVM':
+        svm = SVM()
+        svm.generate_input_data(dorsal_features, palmar_features)
+        svm.fit(svm.dataset)
+
+        for image_id, feature in unlabelled_features.items():
+            feature = list(feature)
+            val = svm.predict(feature)
+            if val.any() == 0:
+                result[image_id] = 'dorsal'
+            elif val.any() == 1:
+                result[image_id] = 'palmar'
 
     #ACCURACY
     metadata = Metadata(metadatapath='Data/HandInfo.csv')
@@ -123,7 +137,7 @@ elif task == '5':
 
     lsh.save_result(result)
 
-elif task == '6' :
+elif task == '6':
     r = int(input('Number Of Images you would like to label as Relevant:'))
     ir = int(input('Number of Images you would like to label as Irrelevant:'))
     final_path = '../Phase2/pickle_files/LBP_PCA_11k.pkl'
@@ -145,7 +159,7 @@ elif task == '6' :
     while r > 0:
         ind = int(input('Enter the Image Number to Label as Relevant:'))
         r -= 1
-        rorir_map[num_image[ind]]=1
+        rorir_map[num_image[ind]] = 1
     while ir > 0:
         ind = int(input('Enter the Image Number to Label as Irrelevant:'))
         ir -= 1
