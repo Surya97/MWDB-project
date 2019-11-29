@@ -46,12 +46,12 @@ if task == '2':
     similarity_val2 = kmeans.get_similarity_val(labelled_dataset_features=palmar_features,
                                                 unlabelled_dataset_features=unlabelled_features)
 
-    result={}
+    result = {}
     for image_id in list(unlabelled_features.keys()):
         if similarity_val1[image_id] <= similarity_val2[image_id]:
-            result[image_id]='dorsal'
+            result[image_id] = 'dorsal'
         else:
-            result[image_id]='palmar'
+            result[image_id] = 'palmar'
 
     #ACCURACY
     metadata = Metadata(metadatapath='Data/HandInfo.csv')
@@ -74,7 +74,6 @@ elif task == '4':
         decisiontree = DecisionTree()
         decisiontree.generate_input_data(dorsal_features, palmar_features)
         dt = decisiontree.build_tree(decisiontree.dataset, 10, 1)
-
 
         for image_id, feature in unlabelled_features.items():
             feature = list(feature)
@@ -126,22 +125,22 @@ elif task == '6' :
     feedback = Feedback()
     task5_result = feedback.task5_result
 
-    num_image={}
+    num_image = {}
     count = 1
     rorir_map = {}
     for image_id, val in task5_result.items():
-        num_image[count]=image_id
+        num_image[count] = image_id
         print(count, image_id)
         rorir_map[num_image[count]] = -1
-        count=count+1
+        count += 1
 
-    while r>0:
+    while r > 0:
         ind = int(input('Enter the Image Number to Label as Relevant:'))
-        r= r-1
+        r -= 1
         rorir_map[num_image[ind]]=1
-    while ir>0:
+    while ir > 0:
         ind = int(input('Enter the Image Number to Label as Irrelevant:'))
-        ir= ir-1
+        ir -= 1
         rorir_map[num_image[ind]] = 0
 
     feedback.generate_input_data(rorir_map, dataset_features)
@@ -149,15 +148,15 @@ elif task == '6' :
 
     if classifier == 'DT':
         decisiontree = DecisionTree()
-        decisiontree.dataset=feedback.dataset
+        decisiontree.dataset = feedback.dataset
         dt = decisiontree.build_tree(decisiontree.dataset, 10, 1)
         for image_id, label in rorir_map.items():
             feature = dataset_features[image_id]
             feature = list(feature)
             feature.append(None)
             val = decisiontree.predict(dt, feature)
-            rorir_map[image_id]=val
+            rorir_map[image_id] = val
 
-    for image_id,val in rorir_map.items():
+    for image_id, val in rorir_map.items():
         print(image_id, val)
 

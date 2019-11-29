@@ -451,7 +451,6 @@ class Metadata:
 
         # print('test_images_list', self.test_images_list)
 
-
         images_list = filtered_images_metadata['imageName'].tolist()
         aspect_of_hand_list = filtered_images_metadata['aspectOfHand'].tolist()
 
