@@ -7,6 +7,7 @@ from Metadata import Metadata
 from customlshash import MyCustomLSH
 from DecisionTree import DecisionTree
 from Feedback import Feedback
+from visualize_clusters import VisualizeClusters
 import pickle
 
 task = input("Please specify the task number: ")
@@ -30,10 +31,23 @@ if task == '2':
     unlabelled_features = label_features.get_unlabelled_images_decomposed_features()
     print('Computing clusters associated with dorsal-hand images...')
     kmeans.fit(dorsal_features)
+
+    # Visualizing dorsal image clusters
+    dorsal_image_cluster_map = kmeans.get_image_cluster_map()
+    dorsal_cluster_visualization = VisualizeClusters(dorsal_features, dorsal_image_cluster_map)
+    dorsal_cluster_visualization.plot()
+
     similarity_val1 = kmeans.get_similarity_val(labelled_dataset_features=dorsal_features,
                                                 unlabelled_dataset_features=unlabelled_features)
+
     print('Computing clusters associated with palmar-hand images...')
     kmeans.fit(palmar_features)
+
+    # Visualizing palmar image clusters
+    palmar_image_cluster_map = kmeans.get_image_cluster_map()
+    palmar_cluster_visualization = VisualizeClusters(dorsal_features, dorsal_image_cluster_map)
+    palmar_cluster_visualization.plot()
+
     similarity_val2 = kmeans.get_similarity_val(labelled_dataset_features=palmar_features,
                                                 unlabelled_dataset_features=unlabelled_features)
     result = {}
