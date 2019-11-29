@@ -9,7 +9,7 @@ def euclidean_distance(dist1, dist2):
 
 
 class KMeans:
-    def __init__(self, k, tolerance=0.001, max_iter=300):
+    def __init__(self, k, tolerance=0.000001, max_iter=300):
         self.k = k
         self.tolerance = tolerance
         self.max_iter = max_iter
@@ -33,14 +33,14 @@ class KMeans:
             print('iteration', i)
             self.classifications = {}
 
+            for _ in range(self.k):
+                self.classifications[_] = []
+
             for j in range(len(features)):
                 feature = features[j]
                 dists = [np.linalg.norm(feature-self.centroids[centroid]) for centroid in self.centroids]
                 classification = dists.index(min(dists))
-                if classification in self.classifications:
-                    self.classifications[classification].append(feature)
-                else:
-                    self.classifications[classification] = [feature]
+                self.classifications[classification].append(feature)
                 self.image_cluster_map[self.image_list[j]] = classification
 
             prev_centroids = dict(self.centroids)
@@ -51,9 +51,11 @@ class KMeans:
             optimized = True
 
             for c in self.centroids:
+                # print(c)
                 original_centroid = prev_centroids[c]
                 current_centroid = self.centroids[c]
-                if np.sum((current_centroid - original_centroid) / original_centroid * 100.0) > self.tolerance:
+                # print("Error", np.sum((current_centroid - original_centroid) / (original_centroid * 100.0)))
+                if abs(np.sum((current_centroid - original_centroid) / (original_centroid * 100.0))) > self.tolerance:
                     print(np.sum((current_centroid - original_centroid) / original_centroid * 100.0))
                     optimized = False
 
