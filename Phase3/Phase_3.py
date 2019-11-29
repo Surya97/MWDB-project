@@ -118,7 +118,7 @@ elif task == '5':
     q_image_id = input("Enter The ImageId:")
     t = int(input('Enter the Value of t:'))
     lsh = MyCustomLSH(number_of_hashes_per_layer =num_hashfunctions, number_of_features =256, num_layers=num_layers)
-    final_path = '../Phase2/pickle_files/LBP_PCA_11k.pkl'
+    final_path = '../Phase2/pickle_files/HOG_SVD_11k.pkl'
     print('loading from pickle file path', final_path)
     infile = open(final_path, 'rb')
     dataset_features = pickle.load(infile)
@@ -140,7 +140,7 @@ elif task == '5':
 elif task == '6':
     r = int(input('Number Of Images you would like to label as Relevant:'))
     ir = int(input('Number of Images you would like to label as Irrelevant:'))
-    final_path = '../Phase2/pickle_files/LBP_PCA_11k.pkl'
+    final_path = '../Phase2/pickle_files/HOG_SVD_11k.pkl'
     print('loading from pickle file path', final_path)
     infile = open(final_path, 'rb')
     dataset_features = pickle.load(infile)

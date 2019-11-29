@@ -417,7 +417,7 @@ class Metadata:
 
 
     def save_label_decomposed_features(self, label):
-        features = misc.load_from_pickle(self.reduced_dimension_pickle_path, 'LBP_PCA')
+        features = misc.load_from_pickle(self.reduced_dimension_pickle_path, 'HOG_SVD')
 
         if self.images_metadata is None:
             self.set_images_metadata()
@@ -440,7 +440,7 @@ class Metadata:
 
 
         misc.save2pickle(label_features_dict, self.reduced_dimension_pickle_path,
-                         feature=('LBP_PCA_' + label))
+                         feature=('HOG_SVD_' + label))
         return
 
     def getimagesdop_dict(self):

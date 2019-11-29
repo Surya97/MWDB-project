@@ -21,15 +21,15 @@ class LabelFeatures:
         self.unlabelled_dataset_features = None
 
     def get_unlabelled_dataset_features(self):
-        self.unlabelled_dataset_features = misc.load_from_pickle(self.reduced_pickle_file_folder, 'unlabelled_LBP_PCA')
+        self.unlabelled_dataset_features = misc.load_from_pickle(self.reduced_pickle_file_folder, 'unlabelled_HOG_SVD')
         return self.unlabelled_dataset_features
 
     def set_features(self):
-        self.decomposition = Decomposition('PCA', 40, 'LBP', self.labelled_dataset_path)
+        self.decomposition = Decomposition('SVD', 256, 'HOG', self.labelled_dataset_path)
         self.decomposition.dimensionality_reduction()
         self.unlabelled_dataset_features = self.get_unlabelled_images_decomposed_features()
         misc.save2pickle(self.unlabelled_dataset_features, self.reduced_pickle_file_folder,
-                         feature='unlabelled_LBP_PCA')
+                         feature='unlabelled_HOG_SVD')
         self.dorsal_features = self.get_features('dorsal')
         self.palmar_features = self.get_features('palmar')
 
@@ -50,7 +50,7 @@ class LabelFeatures:
         metadata = Metadata(images_list)
         metadata.save_label_decomposed_features(label)
 
-        features = misc.load_from_pickle(self.reduced_pickle_file_folder, 'LBP_PCA_'+label)
+        features = misc.load_from_pickle(self.reduced_pickle_file_folder, 'HOG_SVD_'+label)
         return features
 
     def get_unlabelled_images_decomposed_features(self):
@@ -59,7 +59,7 @@ class LabelFeatures:
         images_list = list(misc.get_images_in_directory(test_dataset_folder_path).keys())
         images_decomposed_features = {}
         for image_id in images_list:
-            features_images = FeaturesImages('LBP', test_dataset_folder_path)
+            features_images = FeaturesImages('HOG', test_dataset_folder_path)
             test_image_path = os.path.join(test_dataset_folder_path, image_id)
             test_image_features = list()
             test_image_features.append(features_images.compute_image_features(test_image_path))
