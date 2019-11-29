@@ -13,9 +13,9 @@ class VisualizeClusters:
         self.dataframe["Cluster"] = list(self.cluster_details.values())
         # print("Dataframe head after adding cluster details")
         # print(self.dataframe.head())
-        self.pca = PCA(n_components=2)
+        self.pca = PCA(n_components=3)
         self.PCA_dataframe = pd.DataFrame(self.pca.fit_transform(self.dataframe.drop(["Cluster"], axis=1)))
-        self.PCA_dataframe.columns = ["PC1", "PC2"]
+        self.PCA_dataframe.columns = ["PC1", "PC2", "PC3"]
         self.dataframe = pd.concat([self.dataframe, self.PCA_dataframe], axis=1, join='inner')
         # print("Dataframe after adding PCs")
         # print(self.dataframe.head())
@@ -52,17 +52,19 @@ class VisualizeClusters:
     def plot(self):
         self.trace = [0]*len(self.cluster_data)
         for i in range(len(self.trace)):
-            self.trace[i] = go.Scatter(x=self.cluster_data[i]["PC1"],
-                                       y=self.cluster_data[i]["PC2"],
-                                       mode="markers",
-                                       name="Cluster "+str(i),
-                                       marker=dict(color=self.colors[i%len(self.colors)]),
-                                       text=self.cluster_image_map[i])
+            self.trace[i] = go.Scatter3d(x=self.cluster_data[i]["PC1"],
+                                         y=self.cluster_data[i]["PC2"],
+                                         z=self.cluster_data[i]["PC3"],
+                                         mode="markers",
+                                         name="Cluster "+str(i),
+                                         marker=dict(color=self.colors[i % len(self.colors)]),
+                                         text=self.cluster_image_map[i])
 
-        title = "Cluster visualisation in 2D using PCA"
+        title = "Cluster visualisation in 3D using PCA"
         layout = dict(title=title,
                       xaxis=dict(title="PC1", ticklen=5, zeroline=False),
-                      yaxis=dict(title='PC2', ticklen=5, zeroline=False))
+                      yaxis=dict(title='PC2', ticklen=5, zeroline=False),
+                      zaxis=dict(title="PC3", ticklen=5, zeroline=False))
 
         fig = dict(data=self.trace, layout=layout)
 
