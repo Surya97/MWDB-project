@@ -1,4 +1,5 @@
 from numpy.linalg import svd
+from sklearn.decomposition import TruncatedSVD
 import numpy as np
 import collections
 from sklearn.preprocessing import scale
@@ -15,16 +16,17 @@ class SVD:
         self.u = None
         self.vh = None
         self.s = None
+        self.svd = TruncatedSVD(n_components=self.k_components, random_state=42)
         self.reduced_database_matrix = None
         self.database_image_list = image_list
 
     def decompose(self):
         scaled_feature_matrix = scale(self.database_matrix)
-        self.u, self.s, self.vh = svd(scaled_feature_matrix, full_matrices=True)
+        self.reduced_database_matrix = self.svd.fit_transform(scaled_feature_matrix)
         self.get_decomposed_data_matrix()
 
     def get_feature_latent_semantic_term_weight_sorted(self, idx):
-        latent_semantic = self.vh[idx]
+        latent_semantic = self.svd.components_[idx]
         term_weight_dict = {}
         for index, value in enumerate(latent_semantic, 1):
             term_weight_dict["feature"+str(index)] = value
@@ -33,7 +35,7 @@ class SVD:
         return term_weight_dict_sorted
 
     def get_data_latent_semantic_term_weight_sorted(self, idx):
-        latent_semantic = self.u[:, idx]
+        latent_semantic = self.reduced_database_matrix[:, idx]
         term_weight_dict = {}
         for image_id, value in zip(self.database_image_list, latent_semantic):
             term_weight_dict[image_id] = value
@@ -42,7 +44,7 @@ class SVD:
         return term_weight_dict_sorted
 
     def get_decomposed_data_matrix(self):
-        self.reduced_database_matrix = np.dot(self.u[:, :self.k_components], np.diag(self.s[:self.k_components]))
+        self.reduced_database_matrix = self.reduced_database_matrix[:, :self.k_components]
         return self.reduced_database_matrix
 
     def print_term_weight_pairs(self, k=-1):
@@ -57,13 +59,8 @@ class SVD:
             print("****************************************************************************************")
 
     def get_new_image_features_in_latent_space(self, image_features):
-        print("Before", len(self.database_matrix), len(self.database_matrix[0]))
-        self.database_matrix.append(image_features[0])
-        print(len(self.database_matrix), len(self.database_matrix[0]))
-        print(len(self.database_matrix[-1]))
-        self.decompose()
-        print()
-        return self.reduced_database_matrix[-1]
+        latent_features = self.svd.transform(image_features)
+        return latent_features[0][:self.k_components]
 
 
 
