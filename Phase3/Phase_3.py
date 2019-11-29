@@ -34,7 +34,7 @@ if task == '2':
 
     # Visualizing dorsal image clusters
     dorsal_image_cluster_map = kmeans.get_image_cluster_map()
-    dorsal_cluster_visualization = VisualizeClusters(dorsal_features, dorsal_image_cluster_map)
+    dorsal_cluster_visualization = VisualizeClusters(dorsal_features, dorsal_image_cluster_map, 'dorsal')
     dorsal_cluster_visualization.plot()
 
     similarity_val1 = kmeans.get_similarity_val(labelled_dataset_features=dorsal_features,
@@ -48,7 +48,7 @@ if task == '2':
 
     # Visualizing palmar image clusters
     palmar_image_cluster_map = kmeans.get_image_cluster_map()
-    palmar_cluster_visualization = VisualizeClusters(palmar_features, palmar_image_cluster_map)
+    palmar_cluster_visualization = VisualizeClusters(palmar_features, palmar_image_cluster_map, 'palmar')
     palmar_cluster_visualization.plot()
 
     similarity_val2 = kmeans.get_similarity_val(labelled_dataset_features=palmar_features,

@@ -7,7 +7,7 @@ from sklearn.decomposition import PCA
 
 
 class VisualizeClusters:
-    def __init__(self, dataset_features, cluster_details):
+    def __init__(self, dataset_features, cluster_details, label):
         self.dataframe = pd.DataFrame(list(dataset_features.values()))
         self.cluster_details = cluster_details
         self.dataframe["Cluster"] = list(self.cluster_details.values())
@@ -21,7 +21,7 @@ class VisualizeClusters:
         # print(self.dataframe.head())
         self.cluster_data = list()
         self.trace = []
-
+        self.label = label
         self.cluster_image_map = {}
 
         for image_id, cluster in cluster_details.items():
@@ -60,11 +60,10 @@ class VisualizeClusters:
                                          marker=dict(color=self.colors[i % len(self.colors)]),
                                          text=self.cluster_image_map[i])
 
-        title = "Cluster visualisation in 3D using PCA"
+        title = "Cluster visualisation of " + self.label + " label clusters in 3D using PCA"
         layout = dict(title=title,
                       xaxis=dict(title="PC1", ticklen=5, zeroline=False),
-                      yaxis=dict(title='PC2', ticklen=5, zeroline=False),
-                      zaxis=dict(title="PC3", ticklen=5, zeroline=False))
+                      yaxis=dict(title='PC2', ticklen=5, zeroline=False))
 
         fig = dict(data=self.trace, layout=layout)
 
