@@ -9,6 +9,7 @@ from DecisionTree import DecisionTree
 from Feedback import Feedback
 from visualize_clusters import VisualizeClusters
 import pickle
+import numpy as np
 
 task = input("Please specify the task number: ")
 
@@ -25,6 +26,10 @@ if task == '2':
     palmar_features = label_features.get_label_features('palmar')
     unlabelled_features = label_features.get_unlabelled_images_decomposed_features()
     print('Computing clusters associated with dorsal-hand images...')
+    temp_dictionary = list(dorsal_features.items())
+    np.random.seed(23)
+    np.random.shuffle(temp_dictionary)
+    dorsal_features = dict(temp_dictionary)
     kmeans.fit(dorsal_features)
 
     # Visualizing dorsal image clusters
@@ -36,11 +41,14 @@ if task == '2':
                                                 unlabelled_dataset_features=unlabelled_features)
 
     print('Computing clusters associated with palmar-hand images...')
+    temp_dictionary = list(palmar_features.items())
+    np.random.shuffle(temp_dictionary)
+    palmar_features = dict(temp_dictionary)
     kmeans.fit(palmar_features)
 
     # Visualizing palmar image clusters
     palmar_image_cluster_map = kmeans.get_image_cluster_map()
-    palmar_cluster_visualization = VisualizeClusters(dorsal_features, dorsal_image_cluster_map)
+    palmar_cluster_visualization = VisualizeClusters(palmar_features, palmar_image_cluster_map)
     palmar_cluster_visualization.plot()
 
     similarity_val2 = kmeans.get_similarity_val(labelled_dataset_features=palmar_features,
