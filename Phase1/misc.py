@@ -62,6 +62,7 @@ def resize_image(image, shape):
 def save2pickle(tuples, path, feature):
     filename = os.path.join(path, feature+'.pkl')
     print('saving to pickle file path', filename)
+    print()
     outfile = open(filename, 'wb')
     pickle.dump(tuples, outfile, protocol=2)
     outfile.close()
@@ -70,6 +71,7 @@ def save2pickle(tuples, path, feature):
 def load_from_pickle(path, feature=None, k=-1):
     final_path = os.path.join(path, (feature or '') + '.pkl')
     print('loading from pickle file path', final_path)
+    print()
     infile = open(final_path, 'rb')
     dataset_features = pickle.load(infile)
     return dataset_features
@@ -118,6 +120,7 @@ def plot_similar_images(plot_images_dict, subject_subject_similarity=False):
             ax.text(x=0.5, y=-0.1, s=similarity_string, verticalalignment='bottom', horizontalalignment='center')
 
     plt.show()
+
 
 def getAccuracy(result, images_dop_dict):
     count = 0
