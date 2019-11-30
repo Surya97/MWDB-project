@@ -173,11 +173,12 @@ elif task == '6':
         decisiontree.dataset = feedback.dataset
         dt = decisiontree.build_tree(decisiontree.dataset, 10, 1)
         for image_id, label in rorir_map.items():
-            feature = dataset_features[image_id]
-            feature = list(feature)
-            feature.append(None)
-            val = decisiontree.predict(dt, feature)
-            rorir_map[image_id] = val
+            if rorir_map[image_id] == -1:
+                feature = dataset_features[image_id]
+                feature = list(feature)
+                feature.append(None)
+                val = decisiontree.predict(dt, feature)
+                rorir_map[image_id] = val
 
     for image_id, val in rorir_map.items():
         print(image_id, val)
