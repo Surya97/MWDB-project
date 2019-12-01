@@ -93,7 +93,7 @@ class DecisionTree:
             else:
                 return node['right']
 
-    def generate_input_data(self, dorsal_map, palmar_map ):
+    def generate_input_data(self, dorsal_map, palmar_map):
         dorsalFeatures = list()
         for im, feat in dorsal_map.items():
             f = list()
