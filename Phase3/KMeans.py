@@ -5,7 +5,9 @@ import numpy as np
 
 
 def euclidean_distance(dist1, dist2):
-    return (sum([(a-b)**2 for a, b in zip(dist1, dist2)]))**0.5
+    dist1 = np.array(dist1)
+    dist2 = np.array(dist2)
+    return np.linalg.norm(dist1-dist2)
 
 
 class KMeans:
@@ -28,7 +30,7 @@ class KMeans:
         for i in range(self.k):
             self.centroids[i] = features[i]
             self.image_cluster_map[self.image_list[i]] = i
-
+        print(type(features[0]), type(self.centroids[0]))
         for i in range(self.max_iter):
             print('iteration', i)
             self.classifications = {}
@@ -38,7 +40,7 @@ class KMeans:
 
             for j in range(len(features)):
                 feature = features[j]
-                dists = [np.linalg.norm(feature-self.centroids[centroid]) for centroid in self.centroids]
+                dists = [np.linalg.norm(np.array(feature)-np.array(self.centroids[centroid])) for centroid in self.centroids]
                 classification = dists.index(min(dists))
                 self.classifications[classification].append(feature)
                 self.image_cluster_map[self.image_list[j]] = classification
@@ -55,8 +57,10 @@ class KMeans:
                 original_centroid = prev_centroids[c]
                 current_centroid = self.centroids[c]
                 # print("Error", np.sum((current_centroid - original_centroid) / (original_centroid * 100.0)))
-                if abs(np.sum((current_centroid - original_centroid) / (original_centroid * 100.0))) > self.tolerance:
-                    print(np.sum((current_centroid - original_centroid) / original_centroid * 100.0))
+                # if abs(np.sum((current_centroid - original_centroid) / (original_centroid * 100.0))) > self.tolerance:
+                #     print(np.sum((current_centroid - original_centroid) / original_centroid * 100.0))
+                #     optimized = False
+                if not np.all(original_centroid == current_centroid):
                     optimized = False
 
             if optimized:
@@ -79,7 +83,8 @@ class KMeans:
             dist, unlabelled_cluster_number = self.predict(feature)
             for labelled_image_id, labelled_cluster_number in self.image_cluster_map.items():
                 if unlabelled_cluster_number == labelled_cluster_number:
-                    similarity_val += euclidean_distance(feature, labelled_dataset_features[labelled_image_id])
+                    similarity_val += euclidean_distance(list(feature),
+                                                         labelled_dataset_features[labelled_image_id])
                     count += 1
             unlabelled_images_similarity[unlabelled_image_id] = (similarity_val/count)
         return unlabelled_images_similarity
