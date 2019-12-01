@@ -9,7 +9,6 @@ from Decomposition import Decomposition
 import misc
 
 
-
 def euclidean_distance(image1, image2):
     return (sum([(a - b) ** 2 for a, b in zip(image1, image2)])) ** 0.5
 
