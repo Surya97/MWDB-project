@@ -11,6 +11,7 @@ from visualize_clusters import VisualizeClusters
 import pickle
 import numpy as np
 from SVM import SVM
+from page_rank_util import PageRankUtil
 
 task = input("Please specify the task number: ")
 
@@ -66,6 +67,16 @@ if task == '2':
     metadata = Metadata(metadatapath='Data/HandInfo.csv')
     images_dop_dict = metadata.getimagesdop_dict()
     print('Accuracy:', misc.getAccuracy(result, images_dop_dict))
+
+elif task == '3':
+    folder_path = input("Enter folder path: ")
+    start_images = list(map(str, input("Enter 3 imageids: ").split()))
+    k = int(input("Enter number of outgoing edges: "))
+    m = int(input("Enter number of dominant images to show: "))
+    pagerank = PageRankUtil(folder_path, k, m, start_images)
+    pagerank.page_rank_util()
+    pagerank.plot_k_similar()
+
 
 elif task == '4':
     classifier = input("1.SVM\n2.DT\n3.PPR\nSelect Classifier: ")

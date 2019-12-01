@@ -77,7 +77,7 @@ def load_from_pickle(path, feature=None, k=-1):
     return dataset_features
 
 
-def plot_similar_images(plot_images_dict, subject_subject_similarity=False):
+def plot_similar_images(plot_images_dict, subject_subject_similarity=False, text='\nSimilarity: '):
 
     if subject_subject_similarity:
         n_cols = 6
@@ -114,7 +114,7 @@ def plot_similar_images(plot_images_dict, subject_subject_similarity=False):
             ax = fig.add_subplot(gs[i])
             image = read_image(image_paths[i])
             im = ax.imshow(image, cmap='Greys_r')
-            similarity_string = os.path.basename(image_paths[i]) + '\nSimilarity: ' + str(
+            similarity_string = os.path.basename(image_paths[i]) + text + str(
                 round(image_similarities[i], 2))
             ax.axis('off')
             ax.text(x=0.5, y=-0.1, s=similarity_string, verticalalignment='bottom', horizontalalignment='center')
