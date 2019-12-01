@@ -22,7 +22,8 @@ if task == '2':
     unlabelled_dataset_path = input('Enter unlabelled dataset path: ')
     kmeans = KMeans(c)
     label_features = LabelFeatures(labelled_dataset_path=labelled_dataset_path,
-                                   unlabelled_dataset_path=unlabelled_dataset_path)
+                                   unlabelled_dataset_path=unlabelled_dataset_path, feature_name='SIFT',
+                                   decomposition_name='')
     label_features.set_features()
     dorsal_features = label_features.get_label_features('dorsal')
     palmar_features = label_features.get_label_features('palmar')
@@ -55,7 +56,6 @@ if task == '2':
 
     similarity_val2 = kmeans.get_similarity_val(labelled_dataset_features=palmar_features,
                                                 unlabelled_dataset_features=unlabelled_features)
-
     result = {}
     for image_id in list(unlabelled_features.keys()):
         if similarity_val1[image_id] <= similarity_val2[image_id]:
@@ -84,7 +84,8 @@ elif task == '4':
     unlabelled_dataset_path = input('Enter unlabelled dataset path: ')
 
     label_features = LabelFeatures(labelled_dataset_path=labelled_dataset_path,
-                                   unlabelled_dataset_path=unlabelled_dataset_path)
+                                   unlabelled_dataset_path=unlabelled_dataset_path, feature_name='SIFT',
+                                   decomposition_name='')
     label_features.set_features()
     dorsal_features = label_features.get_label_features('dorsal')
     palmar_features = label_features.get_label_features('palmar')
@@ -128,7 +129,7 @@ elif task == '5':
     num_hashfunctions = int(input("Enter the number Of Hashes per layer:"))
     q_image_id = input("Enter The ImageId:")
     t = int(input('Enter the Value of t:'))
-    lsh = MyCustomLSH(number_of_hashes_per_layer =num_hashfunctions, number_of_features =256, num_layers=num_layers)
+    lsh = MyCustomLSH(number_of_hashes_per_layer=num_hashfunctions, number_of_features=256, num_layers=num_layers)
     final_path = '../Phase2/pickle_files/HOG_SVD_11k.pkl'
     print('loading from pickle file path', final_path)
     infile = open(final_path, 'rb')
