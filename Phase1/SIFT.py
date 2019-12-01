@@ -5,6 +5,7 @@ import collections
 import misc
 import sys
 from tqdm import tqdm
+import numpy as np
 
 
 # def euclidean_distance(image1, image2):
@@ -37,12 +38,19 @@ class SIFT:
     def compute(self, image):
         keypoints, descriptor = self.sift.detectAndCompute(image, None)
         number_of_keypoints = len(keypoints)
-        image_feature = []
-        for index in range(number_of_keypoints):
+        image_feature = list()
+        # print(number_of_keypoints, end=' ')
+        index = 0
+        while index < min(number_of_keypoints, 70):
             keypoint_vector = [keypoints[index].pt[0], keypoints[index].pt[1], keypoints[index].size,
                                keypoints[index].angle]
             keypoint_vector += list(descriptor[index])
-            image_feature.append(keypoint_vector)
-
-
+            # image_feature.append(keypoint_vector)
+            image_feature += keypoint_vector
+            index += 1
+        temp_vector = image_feature[-132:]
+        while index < 70:
+            # 132 is the length of the keypoint_vector -> 4 + 128
+            image_feature += temp_vector
+            index += 1
         return image_feature

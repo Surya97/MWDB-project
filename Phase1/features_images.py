@@ -64,15 +64,15 @@ class FeaturesImages:
 
             # print(folder_images_features_dict)
 
-            if self.model_name == 'SIFT':
-                misc.save2pickle(folder_images_features_dict, os.path.dirname(__file__),
-                                 feature=self.model_name + "_OLD")
-                folder_images_features_dict_sift_new = self.compute_sift_new_features(folder_images_features_dict)
-                misc.save2pickle(folder_images_features_dict_sift_new, os.path.dirname(__file__),
-                                 feature=self.model_name)
-            else:
-                misc.save2pickle(folder_images_features_dict, os.path.dirname(__file__), feature=self.model_name)
-
+            # if self.model_name == 'SIFT':
+            #     misc.save2pickle(folder_images_features_dict, os.path.dirname(__file__),
+            #                      feature=self.model_name + "_OLD")
+            #     folder_images_features_dict_sift_new = self.compute_sift_new_features(folder_images_features_dict)
+            #     misc.save2pickle(folder_images_features_dict_sift_new, os.path.dirname(__file__),
+            #                      feature=self.model_name)
+            # else:
+            #     misc.save2pickle(folder_images_features_dict, os.path.dirname(__file__), feature=self.model_name)
+            misc.save2pickle(folder_images_features_dict, os.path.dirname(__file__), feature=self.model_name)
 
     '''
     Given an image path, based on the model requirements the features vectors are retrieved and
