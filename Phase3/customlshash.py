@@ -10,18 +10,9 @@ wind_size = 5
 offset = np.random.randint(wind_size)
 
 
-def euclidean_dist(x, y):
-        diff = np.array(x) - y
-        return np.sqrt(np.dot(diff, diff))
-
 def euclidean_dist_square(x, y):
         diff = np.array(x) - y
         return np.dot(diff, diff)
-
-def euclidean_dist_centred(x, y):
-        diff = np.mean(x) - np.mean(y)
-        return np.dot(diff, diff)
-
 
 class MyCustomLSH(object):
 
@@ -33,31 +24,35 @@ class MyCustomLSH(object):
                               for _ in range(self.num_layers)]
         self.layers = [dict() for i in range(self.num_layers)]
 
-    def get_combined_hash_value(self, planes, input_point):
+    def get_combined_hash_value(self, planes, input_point, j):
         input_point = np.array(input_point)
         projections = np.dot(planes, input_point)
-        return "".join(['1' if i > 0 else '0' for i in projections])
+        projections = projections/50
+        val= "".join([str(int(i)+j) for i in projections])
+        return val
 
     def add_to_index_structure(self, input_feature, image_id=''):
         value = tuple(input_feature)
         for i, layer in enumerate(self.layers):
-            layer.setdefault(self.get_combined_hash_value(self.random_planes[i], input_feature), []).append((value, image_id))
+            layer.setdefault(self.get_combined_hash_value(self.random_planes[i], input_feature, 0), []).append((value, image_id))
 
     def query(self, feature, num_results=None, distance_func=None):
         image_hits = set()
-        if not distance_func:
-            distance_func = "euclidean"
-
-        if distance_func == "euclidean":
-            calculate_distance = euclidean_dist_square
-        elif distance_func == "true_euclidean":
-            calculate_distance = euclidean_dist
-        else:
-            raise ValueError("The distance function name is invalid.")
+        calculate_distance = euclidean_dist_square
 
         for i, layer in enumerate(self.layers):
-            combined_hash_value = self.get_combined_hash_value(self.random_planes[i], feature)
+            combined_hash_value = self.get_combined_hash_value(self.random_planes[i], feature, 0)
             image_hits.update(layer.get(combined_hash_value, []))
+        j=1
+
+        while len(image_hits)<num_results:
+            for i, layer in enumerate(self.layers):
+                combined_hash_value = self.get_combined_hash_value(self.random_planes[i], feature, j)
+                image_hits.update(layer.get(combined_hash_value, []))
+                combined_hash_value = self.get_combined_hash_value(self.random_planes[i], feature, 0-j)
+                image_hits.update(layer.get(combined_hash_value, []))
+                print(len(image_hits))
+            j+=1
 
         image_hits = [(hit_tuple[0], hit_tuple[1], calculate_distance(feature, np.asarray(hit_tuple[0])))
                       for hit_tuple in image_hits]
@@ -65,7 +60,7 @@ class MyCustomLSH(object):
         
         result = image_hits[:num_results] if num_results else image_hits
 
-        return result
+        return result, len(image_hits)
 
     def save_result(self, result):
         reduced_pickle_file_folder = os.path.join(Path(os.path.dirname(__file__)).parent,
