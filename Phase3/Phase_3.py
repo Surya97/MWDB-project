@@ -14,6 +14,8 @@ from SVM import SVM
 from page_rank_util import PageRankUtil
 import helper_functions
 from tqdm import tqdm
+from decision_tree import DecisionTreeClassifier
+import random
 
 task = input("Please specify the task number: ")
 
@@ -93,21 +95,38 @@ elif task == '4':
                                        unlabelled_dataset_path=unlabelled_dataset_path, feature_name='HOG',
                                        decomposition_name='SVD')
         label_features.set_features()
+        label_folder_features = helper_functions.get_main_features('HOG', labelled_dataset_path)
+
         dorsal_features = label_features.get_label_features('dorsal')
         palmar_features = label_features.get_label_features('palmar')
-        unlabelled_features = label_features.get_unlabelled_images_decomposed_features()
+        # unlabelled_features = label_features.get_unlabelled_images_decomposed_features()
+        unlabelled_features = helper_functions.get_main_features('HOG', unlabelled_dataset_path)
         if classifier == 'DT':
-            decisiontree = DecisionTree()
-            decisiontree.generate_input_data(dorsal_features, palmar_features)
-            dt = decisiontree.build_tree(decisiontree.dataset, 10, 1)
+            decisiontree = DecisionTreeClassifier(max_depth=100)
+            dorsal_images = list(dorsal_features.keys())
+            palmar_images = list(palmar_features.keys())
+            image_list = dorsal_images
+            image_list.extend(palmar_images)
+            random.shuffle(image_list)
+            X = []
+            y = [0]*len(image_list)
 
+            for i in range(0, len(image_list)):
+                image = image_list[i]
+                if image in dorsal_features:
+                    y[i] = 0
+                else:
+                    y[i] = 1
+                X.append(label_folder_features[image])
+            X = np.array(X)
+            y = np.array(y)
+            decisiontree.fit(X, y)
             for image_id, feature in unlabelled_features.items():
-                feature = list(feature)
-                feature.append(None)
-                val = decisiontree.predict(dt, feature)
-                if val == 0:
+                val = decisiontree.predict([feature])
+                print(image_id, val)
+                if val[0] == 0:
                     result[image_id] = 'dorsal'
-                elif val == 1:
+                else:
                     result[image_id] = 'palmar'
 
         elif classifier == 'SVM':
@@ -214,7 +233,7 @@ elif task == '6':
     classifier = input("1.SVM\n2.DT\n3.PPR\n4.Prob\nSelect Classifier: ")
 
     if classifier == 'DT':
-        decisiontree = DecisionTree()
+        decisiontree = DecisionTreeClassifier()
         decisiontree.dataset = feedback.dataset
         dt = decisiontree.build_tree(decisiontree.dataset, 10, 1)
         for image_id, label in rorir_map.items():
