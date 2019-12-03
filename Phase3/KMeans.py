@@ -30,9 +30,9 @@ class KMeans:
         for i in range(self.k):
             self.centroids[i] = features[i]
             self.image_cluster_map[self.image_list[i]] = i
-        print(type(features[0]), type(self.centroids[0]))
+        # print(type(features[0]), type(self.centroids[0]))
         for i in range(self.max_iter):
-            print('iteration', i)
+            print('Iteration', i)
             self.classifications = {}
 
             for _ in range(self.k):
