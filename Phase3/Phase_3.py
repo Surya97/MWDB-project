@@ -193,8 +193,10 @@ elif task == '5':
     for image_id, feature in dataset_features.items():
         lsh.add_to_index_structure(input_feature =feature, image_id=image_id)
 
-    ret_val, no_of_images = lsh.query(dataset_features[q_image_id], num_results=t)
+    ret_val, no_of_images, unique_images = lsh.query(dataset_features[q_image_id], num_results=t)
     print('Query Image:', q_image_id, images_dop_dict[q_image_id])
+    print("Total Number of Images:", no_of_images)
+    print("Unique Images:", unique_images)
     result = {}
     for val in ret_val:
         result[val[0]] = val[1]

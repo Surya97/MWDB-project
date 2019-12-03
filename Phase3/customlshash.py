@@ -64,7 +64,7 @@ class MyCustomLSH(object):
         
         result = image_hits[:num_results] if num_results else image_hits
 
-        return result, len(image_hits)
+        return result, len(image_hits), len(set(image_hits))
 
     def save_result(self, result):
         reduced_pickle_file_folder = os.path.join(Path(os.path.dirname(__file__)).parent,
