@@ -5,7 +5,6 @@ from KMeans import KMeans
 from label_features import LabelFeatures
 from Metadata import Metadata
 from customlshash import MyCustomLSH
-from DecisionTree import DecisionTree
 from Feedback import Feedback
 from visualize_clusters import VisualizeClusters
 import pickle
