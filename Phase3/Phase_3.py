@@ -15,6 +15,7 @@ import helper_functions
 from tqdm import tqdm
 from decision_tree import DecisionTreeClassifier
 import random
+import os
 
 task = input("Please specify the task number: ")
 
@@ -217,6 +218,7 @@ elif task == '6':
     count = 1
     rorir_map = {}
     for image_id, val in task5_result.items():
+        image_id = os.path.basename(image_id)
         num_image[count] = image_id
         print(count, image_id)
         rorir_map[num_image[count]] = -1
