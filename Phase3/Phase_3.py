@@ -235,17 +235,13 @@ elif task == '6':
     classifier = input("1.SVM\n2.DT\n3.PPR\n4.Prob\nSelect Classifier: ")
 
     if classifier == 'DT':
-        decisiontree = DecisionTreeClassifier()
-        decisiontree.dataset = feedback.dataset
-        dt = decisiontree.build_tree(decisiontree.dataset, 10, 1)
+        decisiontree = DecisionTreeClassifier(max_depth=100)
+        decisiontree.fit(feedback.X, feedback.y)
         for image_id, label in rorir_map.items():
             if rorir_map[image_id] == -1:
                 feature = dataset_features[image_id]
-                feature = list(feature)
-                feature.append(None)
-                val = decisiontree.predict(dt, feature)
-                rorir_map[image_id] = val
+                val = decisiontree.predict([feature])
+                rorir_map[image_id] = val[0]
 
     for image_id, val in rorir_map.items():
         print(image_id, val)
-
