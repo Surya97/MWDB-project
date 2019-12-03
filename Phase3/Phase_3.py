@@ -95,12 +95,12 @@ elif task == '4':
                                        unlabelled_dataset_path=unlabelled_dataset_path, feature_name='HOG',
                                        decomposition_name='SVD')
         label_features.set_features()
-        label_folder_features = helper_functions.get_main_features('HOG', labelled_dataset_path)
+        label_folder_features = helper_functions.get_main_features('LBP', labelled_dataset_path)
 
         dorsal_features = label_features.get_label_features('dorsal')
         palmar_features = label_features.get_label_features('palmar')
         # unlabelled_features = label_features.get_unlabelled_images_decomposed_features()
-        unlabelled_features = helper_functions.get_main_features('HOG', unlabelled_dataset_path)
+        unlabelled_features = helper_functions.get_main_features('LBP', unlabelled_dataset_path)
         if classifier == 'DT':
             decisiontree = DecisionTreeClassifier(max_depth=100)
             dorsal_images = list(dorsal_features.keys())
