@@ -125,21 +125,26 @@ elif task == '4':
     else:
         unlabelled_images_list = list(helper_functions.get_images_list(unlabelled_dataset_path).keys())
         result = {}
-        ppr = PageRankUtil(labelled_dataset_path, 10, 20, [])
+        ppr = PageRankUtil(labelled_dataset_path, 70, 20, [])
         original_image_list = ppr.get_original_image_list()
         original_feature_map = ppr.get_original_image_feature_map()
         decomposition = ppr.get_decomposition()
+        images_dop_map = metadata.getimagesdop_dict()
+        # print(images_dop_map)
         for image in tqdm(unlabelled_images_list):
-            ppr = PageRankUtil(labelled_dataset_path, 10, 20, [image], decomposition=decomposition,
+            ppr = PageRankUtil(labelled_dataset_path, 70, 20, [image], decomposition=decomposition,
                                unlabelled_image={image: unlabelled_dataset_path}, image_list=original_image_list,
                                feature_map=original_feature_map)
             ppr.page_rank_util()
             page_ranking = ppr.get_page_ranking()
             dorsal_count = 0
             palmar_count = 0
-            top_10_images = list(page_ranking.keys())[:10]
-            for top_image in top_10_images:
-                if 'dorsal' in metadata.get_label_value_image(top_image, 'aspectOfHand'):
+            # print('aspect of hand of ', image, 'is', metadata.get_label_value_image(image, 'aspectOfHand'))
+            top_20_images = list(page_ranking.keys())[:20]
+            # print(image, top_10_images)
+            # print()
+            for top_image in top_20_images:
+                if 'dorsal' in images_dop_map[top_image]:
                     dorsal_count += 1
                 else:
                     palmar_count += 1
