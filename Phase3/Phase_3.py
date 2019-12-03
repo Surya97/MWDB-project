@@ -171,6 +171,7 @@ elif task == '4':
             else:
                 result[image] = 'palmar'
 
+    print(result)
     #ACCURACY
     images_dop_dict = metadata.getimagesdop_dict()
     print('Accuracy:', misc.getAccuracy(result, images_dop_dict))
