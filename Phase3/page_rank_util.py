@@ -7,14 +7,23 @@ import sys
 sys.path.insert(1, '../Phase1')
 from Decomposition import Decomposition
 import misc
-
+from features_images import FeaturesImages
+import copy
 
 def euclidean_distance(image1, image2):
     return (sum([(a - b) ** 2 for a, b in zip(image1, image2)])) ** 0.5
 
 
+def get_unlabelled_classification_image_features(image_id, unlabelled_folder_path):
+    test_image_path = os.path.join(Path(os.path.dirname(__file__)).parent, unlabelled_folder_path, image_id)
+    features_images = FeaturesImages('HOG', unlabelled_folder_path)
+    unlabelled_image_features = features_images.compute_image_features(test_image_path)
+    return [unlabelled_image_features]
+
+
 class PageRankUtil:
-    def __init__(self, folder_path, k, m, start_images_list=None, alpha=0.85):
+    def __init__(self, folder_path, k, m, start_images_list=None, alpha=0.85, unlabelled_image=None,
+                 decomposition=None, image_list=None, feature_map=None):
 
         self.image_feature_map = None
         self.images_list = []
@@ -25,19 +34,42 @@ class PageRankUtil:
                                                        'Phase2', 'pickle_files')
         self.start_images_list = start_images_list
         self.image_image_similarity_map = {}
+        self.decomposition = decomposition
+        self.unlabelled_image = unlabelled_image
+        self.temp_image_list = image_list
+        self.temp_feature_map = feature_map
+        self.original_feature_map = {}
+        self.original_image_list = []
         self.teleportation = []
         self.alpha = alpha
         self.random_walk = []
-        self.get_image_dataset_features()
+        if self.unlabelled_image is None:
+            self.get_image_dataset_features()
+        self.initialize()
         self.page_ranking = {}
         self.m = m
 
     def get_image_dataset_features(self):
-        decomposition = Decomposition('SVD', k_components=256, feature_extraction_model_name='HOG',
-                                      test_folder_path=self.test_folder_path)
-        decomposition.dimensionality_reduction()
+        self.decomposition = Decomposition('SVD', k_components=256, feature_extraction_model_name='HOG',
+                                           test_folder_path=self.test_folder_path)
+        self.decomposition.dimensionality_reduction()
         self.image_feature_map = misc.load_from_pickle(self.reduced_pickle_file_folder, 'HOG_SVD')
         self.images_list = list(self.image_feature_map.keys())
+        self.original_feature_map = copy.deepcopy(self.image_feature_map)
+        self.original_image_list = copy.deepcopy(self.images_list)
+
+    def initialize(self):
+        if self.unlabelled_image is not None:
+            self.set_image_list_and_feature_map(self.temp_image_list, self.temp_feature_map)
+            unlabelled_image = list(self.unlabelled_image.keys())[0]
+            # print('unlabelled image is', unlabelled_image)
+            self.images_list.append(unlabelled_image)
+            unlabelled_image_feature = self.decomposition.decomposition_model.get_new_image_features_in_latent_space(
+                get_unlabelled_classification_image_features(unlabelled_image,
+                                                             self.unlabelled_image[unlabelled_image]))
+            # print('Unlabelled image feature', unlabelled_image_feature)
+            self.image_feature_map[unlabelled_image] = unlabelled_image_feature
+
         self.teleportation = [[0.0 for i in range(1)] for j in range(len(self.images_list))]
         self.random_walk = [[0.0 for i in range(len(self.images_list))] for j in range(len(self.images_list))]
         if self.start_images_list is not None:
@@ -67,6 +99,9 @@ class PageRankUtil:
             for image2, distance in similarity_list:
                 self.random_walk[image_idx][self.images_list.index(image2)] = distance
 
+        # print('Random walk')
+        # print(self.random_walk)
+
         for i in range(len(self.random_walk)):
             temp = self.random_walk[i]
             self.random_walk[i] = [(self.alpha * j)/sum(temp) for j in temp]
@@ -85,6 +120,28 @@ class PageRankUtil:
         sorted_pagerank = sorted(self.page_ranking.items(), key=lambda kv: kv[1], reverse=True)
         self.page_ranking = dict(collections.OrderedDict(sorted_pagerank))
         # print(self.page_ranking)
+
+    def get_page_ranking(self):
+        return self.page_ranking
+
+    def set_unlabelled_image(self, unlabelled_image):
+        self.unlabelled_image = unlabelled_image
+
+    def set_start_images_list(self, image):
+        self.start_images_list = [image]
+
+    def get_decomposition(self):
+        return self.decomposition
+
+    def get_original_image_feature_map(self):
+        return self.original_feature_map
+
+    def get_original_image_list(self):
+        return self.original_image_list
+
+    def set_image_list_and_feature_map(self, image_list, image_feature_map):
+        self.images_list = image_list
+        self.image_feature_map = image_feature_map
 
     def plot_k_similar(self):
         count = 1

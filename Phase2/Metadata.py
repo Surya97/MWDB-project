@@ -49,6 +49,9 @@ class Metadata:
     def set_images_metadata(self):
         self.images_metadata = pd.read_csv(self.metadata_file_path)
 
+    def get_label_value_image(self, image, label):
+        return self.images_metadata[self.images_metadata['imageName'] == image][label]
+
     def get_specific_metadata_images_list(self, feature_dict=None):
 
         if self.images_metadata is None:

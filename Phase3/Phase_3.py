@@ -12,6 +12,8 @@ import pickle
 import numpy as np
 from SVM import SVM
 from page_rank_util import PageRankUtil
+import helper_functions
+from tqdm import tqdm
 
 task = input("Please specify the task number: ")
 
@@ -83,43 +85,70 @@ elif task == '4':
     labelled_dataset_path = input('Enter labelled dataset path: ')
     unlabelled_dataset_path = input('Enter unlabelled dataset path: ')
 
-    label_features = LabelFeatures(labelled_dataset_path=labelled_dataset_path,
-                                   unlabelled_dataset_path=unlabelled_dataset_path, feature_name='SIFT',
-                                   decomposition_name='')
-    label_features.set_features()
-    dorsal_features = label_features.get_label_features('dorsal')
-    palmar_features = label_features.get_label_features('palmar')
-    unlabelled_features = label_features.get_unlabelled_images_decomposed_features()
+    metadata = Metadata(metadatapath='Data/HandInfo.csv')
     result = {}
-    if classifier == 'DT':
-        decisiontree = DecisionTree()
-        decisiontree.generate_input_data(dorsal_features, palmar_features)
-        dt = decisiontree.build_tree(decisiontree.dataset, 10, 1)
 
-        for image_id, feature in unlabelled_features.items():
-            feature = list(feature)
-            feature.append(None)
-            val = decisiontree.predict(dt, feature)
-            if val == 0:
-                result[image_id] = 'dorsal'
-            elif val == 1:
-                result[image_id] = 'palmar'
+    if classifier != 'PPR':
+        label_features = LabelFeatures(labelled_dataset_path=labelled_dataset_path,
+                                       unlabelled_dataset_path=unlabelled_dataset_path, feature_name='HOG',
+                                       decomposition_name='SVD')
+        label_features.set_features()
+        dorsal_features = label_features.get_label_features('dorsal')
+        palmar_features = label_features.get_label_features('palmar')
+        unlabelled_features = label_features.get_unlabelled_images_decomposed_features()
+        if classifier == 'DT':
+            decisiontree = DecisionTree()
+            decisiontree.generate_input_data(dorsal_features, palmar_features)
+            dt = decisiontree.build_tree(decisiontree.dataset, 10, 1)
 
-    if classifier == 'SVM':
-        svm = SVM()
-        svm.generate_input_data(dorsal_features, palmar_features)
-        svm.fit(svm.dataset)
+            for image_id, feature in unlabelled_features.items():
+                feature = list(feature)
+                feature.append(None)
+                val = decisiontree.predict(dt, feature)
+                if val == 0:
+                    result[image_id] = 'dorsal'
+                elif val == 1:
+                    result[image_id] = 'palmar'
 
-        for image_id, feature in unlabelled_features.items():
-            feature = list(feature)
-            val = svm.predict(feature)
-            if val.any() == 0:
-                result[image_id] = 'dorsal'
-            elif val.any() == 1:
-                result[image_id] = 'palmar'
+        elif classifier == 'SVM':
+            svm = SVM()
+            svm.generate_input_data(dorsal_features, palmar_features)
+            svm.fit(svm.dataset)
+
+            for image_id, feature in unlabelled_features.items():
+                feature = list(feature)
+                val = svm.predict(feature)
+                if val.any() == 0:
+                    result[image_id] = 'dorsal'
+                elif val.any() == 1:
+                    result[image_id] = 'palmar'
+    else:
+        unlabelled_images_list = list(helper_functions.get_images_list(unlabelled_dataset_path).keys())
+        result = {}
+        ppr = PageRankUtil(labelled_dataset_path, 10, 20, [])
+        original_image_list = ppr.get_original_image_list()
+        original_feature_map = ppr.get_original_image_feature_map()
+        decomposition = ppr.get_decomposition()
+        for image in tqdm(unlabelled_images_list):
+            ppr = PageRankUtil(labelled_dataset_path, 10, 20, [image], decomposition=decomposition,
+                               unlabelled_image={image: unlabelled_dataset_path}, image_list=original_image_list,
+                               feature_map=original_feature_map)
+            ppr.page_rank_util()
+            page_ranking = ppr.get_page_ranking()
+            dorsal_count = 0
+            palmar_count = 0
+            top_10_images = list(page_ranking.keys())[:10]
+            for top_image in top_10_images:
+                if 'dorsal' in metadata.get_label_value_image(top_image, 'aspectOfHand'):
+                    dorsal_count += 1
+                else:
+                    palmar_count += 1
+            if dorsal_count > palmar_count:
+                result[image] = 'dorsal'
+            else:
+                result[image] = 'palmar'
 
     #ACCURACY
-    metadata = Metadata(metadatapath='Data/HandInfo.csv')
     images_dop_dict = metadata.getimagesdop_dict()
     print('Accuracy:', misc.getAccuracy(result, images_dop_dict))
 
