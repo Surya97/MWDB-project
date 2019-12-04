@@ -19,6 +19,7 @@ import random
 import os
 import collections
 from ProbRF import *
+import copy
 
 task = input("Please specify the task number: ")
 
@@ -138,7 +139,7 @@ elif task == '4':
         decisiontree.fit(X, y)
         for image_id, feature in unlabelled_features.items():
             val = decisiontree.predict([feature])
-            print(image_id, val)
+            # print(image_id, val)
             if val[0] == 0:
                 result[image_id] = 'dorsal'
             else:
@@ -296,11 +297,51 @@ elif task == '6':
                 feature = dataset_features[image_id]
                 val = predict(model, feature)
                 rorir_map[image_id] = int(val)
-                
+
+    elif classifier == 'PPR':
+        folder_path = "../data/Hands"
+        relevant_images_list = []
+        unclassified_images = []
+        image_feature_map = {}
+        for image, label in rorir_map.items():
+            if label == 1:
+                relevant_images_list.append(image)
+            elif label == -1:
+                unclassified_images.append(image)
+            image_feature_map[image] = dataset_features[image]
+        ppr = PageRankUtil('', 5, 10, [], image_list=list(task5_result.keys()),
+                           feature_map=image_feature_map)
+
+        imglist, imgmap = ppr.get_image_list_and_feature_map()
+        print('Image list', imglist)
+        # print('Image map', imgmap)
+        for image in unclassified_images:
+            ppr.set_unlabelled_image({image: folder_path})
+            temp_relevant_images = copy.deepcopy(relevant_images_list)
+            temp_relevant_images.append(image)
+            print('Temp relevant images', temp_relevant_images)
+            ppr.set_start_images_list(temp_relevant_images)
+            ppr.set_image_list_and_feature_map(list(task5_result.keys()), image_feature_map)
+            ppr.initialize()
+            ppr.page_rank_util()
+            page_ranking = ppr.get_page_ranking()
+            result_relevant_count = 0
+            result_irrelevant_count = 0
+            top_10_images = list(page_ranking.keys())[:10]
+            for top_image in top_10_images:
+                if top_image in relevant_images_list:
+                    result_relevant_count += 1
+                elif rorir_map[top_image] == 0:
+                    result_irrelevant_count += 1
+
+            if result_relevant_count > result_irrelevant_count:
+                rorir_map[image] = 1
+            else:
+                rorir_map[image] = 0
+
     old_list_images=list()
     for image_id, val in rorir_map.items():
         old_list_images.append(image_id)
-
 
     new_ordered_images = [(image_id,
                    feedback.euclidean_distance(dataset_features[base_id], dataset_features[image_id])) for image_id in old_list_images]
