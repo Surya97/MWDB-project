@@ -16,6 +16,7 @@ from tqdm import tqdm
 from decision_tree import DecisionTreeClassifier
 import random
 import os
+import collections
 
 task = input("Please specify the task number: ")
 
@@ -128,7 +129,6 @@ elif task == '4':
                     result[image_id] = 'dorsal'
                 else:
                     result[image_id] = 'palmar'
-
         elif classifier == 'SVM':
             svm = SVM()
             svm.generate_input_data(dorsal_features, palmar_features)
@@ -213,7 +213,7 @@ elif task == '6':
     dataset_features = pickle.load(infile)
     feedback = Feedback()
     task5_result = feedback.task5_result
-
+    base_id=None
     num_image = {}
     count = 1
     rorir_map = {}
@@ -223,10 +223,13 @@ elif task == '6':
         print(count, image_id)
         rorir_map[num_image[count]] = -1
         count += 1
-
+    count=0
     while r > 0:
         ind = int(input('Enter the Image Number to Label as Relevant:'))
         r -= 1
+        if count==0:
+            base_id=num_image[ind]
+            count += 1
         rorir_map[num_image[ind]] = 1
     while ir > 0:
         ind = int(input('Enter the Image Number to Label as Irrelevant:'))
@@ -245,5 +248,27 @@ elif task == '6':
                 val = decisiontree.predict([feature])
                 rorir_map[image_id] = val[0]
 
+    old_list_images=list()
     for image_id, val in rorir_map.items():
-        print(image_id, val)
+        old_list_images.append(image_id)
+
+
+    new_ordered_images = [(image_id,
+                   feedback.euclidean_distance(dataset_features[base_id], dataset_features[image_id])) for image_id in old_list_images]
+    new_ordered_images.sort(key=lambda v: v[1])
+
+    result = collections.OrderedDict()
+    for val in new_ordered_images:
+        result[val[0]] = val[1]
+    final_result = collections.OrderedDict()
+    for val, dist_val in result.items():
+        if rorir_map[val] == 1:
+            print(val, rorir_map[val])
+            final_result[val]=dist_val
+
+    for val, dist_val in result.items():
+        if rorir_map[val] == 0:
+            print(val, rorir_map[val])
+            final_result[val]=dist_val
+
+    feedback.save_result(final_result)
