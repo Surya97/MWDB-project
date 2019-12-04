@@ -34,3 +34,11 @@ class Feedback:
         self.y=y
 
         return
+
+    def euclidean_distance(self, dist1, dist2):
+        return (sum([(a - b) ** 2 for a, b in zip(dist1, dist2)])) ** 0.5
+
+    def save_result(self, result):
+        reduced_pickle_file_folder = os.path.join(Path(os.path.dirname(__file__)).parent,
+                                                       'Phase2', 'pickle_files')
+        misc.save2pickle(result, reduced_pickle_file_folder, 'Task_5_Result')
