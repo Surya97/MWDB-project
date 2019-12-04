@@ -5,13 +5,16 @@ from pathlib import Path
 import os
 import sys
 sys.path.insert(1, '../Phase1')
-from Decomposition import Decomposition
 import misc
 from features_images import FeaturesImages
 import copy
+import numpy as np
+
 
 def euclidean_distance(image1, image2):
-    return (sum([(a - b) ** 2 for a, b in zip(image1, image2)])) ** 0.5
+    dist1 = np.array(image1)
+    dist2 = np.array(image2)
+    return np.linalg.norm(dist1 - dist2)
 
 
 class PageRankUtil:
@@ -46,8 +49,8 @@ class PageRankUtil:
         features_obj.compute_features_images_folder()
         self.image_feature_map = misc.load_from_pickle(self.pickle_file_folder, self.feature_name)
         self.images_list = list(self.image_feature_map.keys())
-        self.original_feature_map = self.image_feature_map
-        self.original_image_list = self.images_list
+        self.original_feature_map = copy.deepcopy(self.image_feature_map)
+        self.original_image_list = copy.deepcopy(self.images_list)
 
     def get_unlabelled_classification_image_features(self, image_id, unlabelled_folder_path):
         test_image_path = os.path.join(Path(os.path.dirname(__file__)).parent, unlabelled_folder_path, image_id)
@@ -56,12 +59,13 @@ class PageRankUtil:
         return [unlabelled_image_features]
 
     def initialize(self):
-        print('Initializing random walk and teleportation matrices')
+        # print('Initializing random walk and teleportation matrices.........')
         if self.unlabelled_image is not None:
+            # print('Adding unlabeled image')
             unlabelled_image = list(self.unlabelled_image.keys())[0]
             self.images_list.append(unlabelled_image)
             unlabelled_image_feature = self.get_unlabelled_classification_image_features(
-                unlabelled_image=unlabelled_image, unlabelled_folder_path=self.unlabelled_image[unlabelled_image])
+                image_id=unlabelled_image, unlabelled_folder_path=self.unlabelled_image[unlabelled_image])
             self.image_feature_map[unlabelled_image] = unlabelled_image_feature
 
         self.teleportation = [[0.0 for i in range(1)] for j in range(len(self.images_list))]
@@ -75,14 +79,18 @@ class PageRankUtil:
         self.create_random_walk()
 
     def create_random_walk(self):
+        # print('Creating Random Walk using image image similarities..............')
         for image1, feature1 in self.image_feature_map.items():
             for image2, feature2 in self.image_feature_map.items():
                 if image2 != image1:
+                    # print('Image1', image1, 'feature1', feature1)
+                    # print('Image2', image2, 'feature2', feature2)
                     distance = euclidean_distance(feature1, feature2)
                     if image1 in self.image_image_similarity_map:
                         self.image_image_similarity_map[image1].append(tuple((image2, distance)))
                     else:
                         self.image_image_similarity_map[image1] = [tuple((image2, distance))]
+        # print(self.image_image_similarity_map)
 
         for image, similarity_list in self.image_image_similarity_map.items():
             self.image_image_similarity_map[image] = sorted(self.image_image_similarity_map[image],
@@ -93,9 +101,6 @@ class PageRankUtil:
             for image2, distance in similarity_list:
                 self.random_walk[image_idx][self.images_list.index(image2)] = distance
 
-        # print('Random walk')
-        # print(self.random_walk)
-
         for i in range(len(self.random_walk)):
             temp = self.random_walk[i]
             self.random_walk[i] = [(self.alpha * j)/sum(temp) for j in temp]
@@ -104,6 +109,7 @@ class PageRankUtil:
         self.random_walk = np.array(self.random_walk)
 
     def page_rank_util(self):
+        # print('Starting Page rank...........')
         pagerank = PageRank(self.random_walk, self.teleportation)
         final_steady_state = pagerank.get_final_steady_state()
         # print(final_steady_state)

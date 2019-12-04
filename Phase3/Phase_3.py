@@ -183,25 +183,23 @@ elif task == '4':
                 result[image_id] = 'palmar'
 
     elif classifier == 'PPR':
-        unlabelled_images_list = list(helper_functions.get_images_list(unlabelled_dataset_path).keys())
+        unlabelled_images_list = list(unlabelled_features.keys())
         result = {}
-        ppr = PageRankUtil(labelled_dataset_path, 30, 10, [])
+        ppr = PageRankUtil(labelled_dataset_path, 10, 20, [], feature_name=label_feature_name)
         original_image_list = ppr.get_original_image_list()
         original_feature_map = ppr.get_original_image_feature_map()
         images_dop_map = metadata.getimagesdop_dict()
         # print(images_dop_map)
         for image in tqdm(unlabelled_images_list):
-            ppr.set_unlabeled_image({image: unlabelled_dataset_path})
-            ppr.set_set_image_list_and_feature_map(original_image_list, original_feature_map)
+            ppr.set_unlabelled_image({image: unlabelled_dataset_path})
+            ppr.set_start_images_list(image)
+            ppr.set_image_list_and_feature_map(original_image_list, original_feature_map)
             ppr.initialize()
             ppr.page_rank_util()
             page_ranking = ppr.get_page_ranking()
             dorsal_count = 0
             palmar_count = 0
-            # print('aspect of hand of ', image, 'is', metadata.get_label_value_image(image, 'aspectOfHand'))
-            top_10_images = list(page_ranking.keys())[:10]
-            # print(image, top_10_images)
-            # print()
+            top_10_images = list(page_ranking.keys())[:20]
             for top_image in top_10_images:
                 if 'dorsal' in images_dop_map[top_image]:
                     dorsal_count += 1
