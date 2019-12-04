@@ -9,7 +9,8 @@ from Feedback import Feedback
 from visualize_clusters import VisualizeClusters
 import pickle
 import numpy as np
-from SVM import SVM
+# from SVM import SVM
+from svm_test import SVM, linear_kernel, polynomial_kernel, gaussian_kernel
 from page_rank_util import PageRankUtil
 import helper_functions
 from tqdm import tqdm
@@ -138,6 +139,46 @@ elif task == '4':
                 result[image_id] = 'dorsal'
             else:
                 result[image_id] = 'palmar'
+
+    elif classifier == 'SVM':
+        # svm = SVM()
+        # svm.generate_input_data(dorsal_features, palmar_features)
+        # svm.fit(svm.dataset)
+        # for image_id, feature in unlabelled_features.items():
+        #     feature = list(feature)
+        #     val = svm.predict(feature)
+        #     print(image_id, val)
+        #     if val.any() == 0:
+        #         result[image_id] = 'dorsal'
+        #     elif val.any() == 1:
+        #         result[image_id] = 'palmar'
+        dorsal_images = list(dorsal_features.keys())
+        palmar_images = list(palmar_features.keys())
+        image_list = dorsal_images
+        image_list.extend(palmar_images)
+        random.shuffle(image_list)
+        X = []
+        y = [0] * len(image_list)
+
+        for i in range(0, len(image_list)):
+            image = image_list[i]
+            if image in dorsal_features:
+                y[i] = -1
+            else:
+                y[i] = 1
+            X.append(label_folder_features[image])
+        X = np.array(X)
+        y = np.array(y)
+        svm = SVM()
+        svm.fit(X, y)
+        for image_id, feature in unlabelled_features.items():
+            val = svm.predict([feature])
+            print(image_id, val)
+            if val[0] == 0:
+                result[image_id] = 'dorsal'
+            else:
+                result[image_id] = 'palmar'
+
     elif classifier == 'PPR':
         unlabelled_images_list = list(helper_functions.get_images_list(unlabelled_dataset_path).keys())
         result = {}
