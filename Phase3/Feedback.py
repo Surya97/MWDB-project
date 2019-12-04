@@ -15,6 +15,16 @@ class Feedback:
         self.dataset = list()
         self.X = None
         self.y = None
+        self.dataset=list()
+
+    def generate_input_data_set(self, rorir_map, dataset_features):
+        for image_id, label in rorir_map.items():
+            image_id = os.path.basename(image_id)
+            if label==0 or label==1:
+                feat = dataset_features[image_id].tolist()
+                feat+=[label]
+                self.dataset.append(np.array(feat))
+        return
 
     def set_task5_result(self):
         self.task5_result = misc.load_from_pickle(self.reduced_pickle_file_folder, 'Task_5_Result')

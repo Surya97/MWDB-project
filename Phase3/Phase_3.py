@@ -285,7 +285,17 @@ elif task == '6':
                 feature = dataset_features[image_id]
                 val = decisiontree.predict([feature])
                 rorir_map[image_id] = val[0]
-
+    elif classifier == 'Prob':
+        feedback.generate_input_data_set(rorir_map, dataset_features)
+        dataset = feedback.dataset
+        model = division_by_class(dataset)
+        # define a new record
+        for image_id, label in rorir_map.items():
+            if rorir_map[image_id] == -1:
+                feature = dataset_features[image_id]
+                val = predict(model, feature)
+                rorir_map[image_id] = int(val)
+                
     old_list_images=list()
     for image_id, val in rorir_map.items():
         old_list_images.append(image_id)
