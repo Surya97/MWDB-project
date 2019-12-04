@@ -311,12 +311,12 @@ elif task == '6':
     final_result = collections.OrderedDict()
     for val, dist_val in result.items():
         if rorir_map[val] == 1:
-            print(val, rorir_map[val])
+            print(val, "Relevant")
             final_result[val]=dist_val
 
     for val, dist_val in result.items():
         if rorir_map[val] == 0:
-            print(val, rorir_map[val])
+            print(val, "Irrelavant")
             final_result[val]=dist_val
 
     feedback.save_result(final_result)
