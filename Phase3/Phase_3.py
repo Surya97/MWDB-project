@@ -69,6 +69,8 @@ if task == '2':
         else:
             result[image_id] = 'palmar'
 
+    print(result)
+
     #ACCURACY
     metadata = Metadata(metadatapath='Data/HandInfo.csv')
     images_dop_dict = metadata.getimagesdop_dict()
