@@ -14,31 +14,23 @@ def euclidean_distance(image1, image2):
     return (sum([(a - b) ** 2 for a, b in zip(image1, image2)])) ** 0.5
 
 
-def get_unlabelled_classification_image_features(image_id, unlabelled_folder_path):
-    test_image_path = os.path.join(Path(os.path.dirname(__file__)).parent, unlabelled_folder_path, image_id)
-    features_images = FeaturesImages('HOG', unlabelled_folder_path)
-    unlabelled_image_features = features_images.compute_image_features(test_image_path)
-    return [unlabelled_image_features]
-
-
 class PageRankUtil:
     def __init__(self, folder_path, k, m, start_images_list=None, alpha=0.85, unlabelled_image=None,
-                 decomposition=None, image_list=None, feature_map=None):
+                 image_list=None, feature_map=None, feature_name='HOG'):
 
         self.image_feature_map = None
         self.images_list = []
         self.pagerank = None
         self.k = k
         self.test_folder_path = folder_path
-        self.reduced_pickle_file_folder = os.path.join(Path(os.path.dirname(__file__)).parent,
-                                                       'Phase2', 'pickle_files')
+        self.pickle_file_folder = os.path.join(Path(os.path.dirname(__file__)).parent, 'Phase1')
         self.start_images_list = start_images_list
         self.image_image_similarity_map = {}
-        self.decomposition = decomposition
         self.unlabelled_image = unlabelled_image
         self.temp_image_list = image_list
         self.temp_feature_map = feature_map
         self.original_feature_map = {}
+        self.feature_name = feature_name
         self.original_image_list = []
         self.teleportation = []
         self.alpha = alpha
@@ -50,24 +42,26 @@ class PageRankUtil:
         self.m = m
 
     def get_image_dataset_features(self):
-        self.decomposition = Decomposition('SVD', k_components=256, feature_extraction_model_name='HOG',
-                                           test_folder_path=self.test_folder_path)
-        self.decomposition.dimensionality_reduction()
-        self.image_feature_map = misc.load_from_pickle(self.reduced_pickle_file_folder, 'HOG_SVD')
+        features_obj = FeaturesImages(self.feature_name, self.test_folder_path)
+        features_obj.compute_features_images_folder()
+        self.image_feature_map = misc.load_from_pickle(self.pickle_file_folder, self.feature_name)
         self.images_list = list(self.image_feature_map.keys())
-        self.original_feature_map = copy.deepcopy(self.image_feature_map)
-        self.original_image_list = copy.deepcopy(self.images_list)
+        self.original_feature_map = self.image_feature_map
+        self.original_image_list = self.images_list
+
+    def get_unlabelled_classification_image_features(self, image_id, unlabelled_folder_path):
+        test_image_path = os.path.join(Path(os.path.dirname(__file__)).parent, unlabelled_folder_path, image_id)
+        features_images = FeaturesImages(self.feature_name, unlabelled_folder_path)
+        unlabelled_image_features = features_images.compute_image_features(test_image_path)
+        return [unlabelled_image_features]
 
     def initialize(self):
+        print('Initializing random walk and teleportation matrices')
         if self.unlabelled_image is not None:
-            self.set_image_list_and_feature_map(self.temp_image_list, self.temp_feature_map)
             unlabelled_image = list(self.unlabelled_image.keys())[0]
-            # print('unlabelled image is', unlabelled_image)
             self.images_list.append(unlabelled_image)
-            unlabelled_image_feature = self.decomposition.decomposition_model.get_new_image_features_in_latent_space(
-                get_unlabelled_classification_image_features(unlabelled_image,
-                                                             self.unlabelled_image[unlabelled_image]))
-            # print('Unlabelled image feature', unlabelled_image_feature)
+            unlabelled_image_feature = self.get_unlabelled_classification_image_features(
+                unlabelled_image=unlabelled_image, unlabelled_folder_path=self.unlabelled_image[unlabelled_image])
             self.image_feature_map[unlabelled_image] = unlabelled_image_feature
 
         self.teleportation = [[0.0 for i in range(1)] for j in range(len(self.images_list))]

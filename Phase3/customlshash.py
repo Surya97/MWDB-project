@@ -54,7 +54,7 @@ class MyCustomLSH(object):
                 image_hits.update(layer.get(combined_hash_value, []))
                 combined_hash_value = self.get_combined_hash_value(self.random_planes[i], feature, 0-j)
                 image_hits.update(layer.get(combined_hash_value, []))
-                print(len(image_hits))
+                # print(len(image_hits))
             j+=1
         # image_hits = [(hit_tuple[0], hit_tuple[1], calculate_distance(feature, np.asarray(hit_tuple[0])))
         #               for hit_tuple in image_hits]
