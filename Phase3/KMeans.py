@@ -65,6 +65,7 @@ class KMeans:
 
             if optimized:
                 print(self.image_cluster_map)
+                print()
                 break
 
     def predict(self, data):

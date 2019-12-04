@@ -298,30 +298,46 @@ elif task == '6':
                 val = predict(model, feature)
                 rorir_map[image_id] = int(val)
 
+    elif classifier == 'SVM':
+        svm = SVM()
+        svm.fit(feedback.X, feedback.y)
+        for image_id, label in rorir_map.items():
+            if rorir_map[image_id] == -1:
+                feature = dataset_features[image_id]
+                val = svm.predict([feature])
+                rorir_map[image_id] = val[0]
+
     elif classifier == 'PPR':
-        folder_path = "../data/Hands"
+        folder_path = "data/Hands"
         relevant_images_list = []
         unclassified_images = []
+        non_relevant_images_list = []
         image_feature_map = {}
+        total_images = []
         for image, label in rorir_map.items():
             if label == 1:
                 relevant_images_list.append(image)
             elif label == -1:
                 unclassified_images.append(image)
-            image_feature_map[image] = dataset_features[image]
-        ppr = PageRankUtil('', 5, 10, [], image_list=list(task5_result.keys()),
+            elif label == 0:
+                non_relevant_images_list.append(image)
+            if label == 0 or label == 1:
+                image_feature_map[image] = dataset_features[image]
+                total_images.append(image)
+        ppr = PageRankUtil('', 5, 10, [], image_list=list(image_feature_map.keys()),
                            feature_map=image_feature_map)
 
         imglist, imgmap = ppr.get_image_list_and_feature_map()
-        print('Image list', imglist)
+
+        # print('Image list', imglist)
         # print('Image map', imgmap)
         for image in unclassified_images:
-            ppr.set_unlabelled_image({image: folder_path})
+            ppr.set_unlabelled_image({image: dataset_features[image].tolist()})
             temp_relevant_images = copy.deepcopy(relevant_images_list)
-            temp_relevant_images.append(image)
-            print('Temp relevant images', temp_relevant_images)
-            ppr.set_start_images_list(temp_relevant_images)
-            ppr.set_image_list_and_feature_map(list(task5_result.keys()), image_feature_map)
+            temp_relevant_images.extend(non_relevant_images_list)
+            # print('Temp relevant images', temp_relevant_images)
+            ppr.set_start_images_list(image)
+            ppr.set_image_list_and_feature_map(list(image_feature_map.keys()), image_feature_map)
             ppr.initialize()
             ppr.page_rank_util()
             page_ranking = ppr.get_page_ranking()
