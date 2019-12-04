@@ -87,73 +87,69 @@ elif task == '4':
     labelled_dataset_path = input('Enter labelled dataset path: ')
     unlabelled_dataset_path = input('Enter unlabelled dataset path: ')
 
-    metadata = Metadata(metadatapath='Data/HandInfo.csv')
+    label_feature_name = 'LBP'
+    if classifier == 'DT':
+        label_feature_name = 'LBP'
+    elif classifier == 'PPR':
+        label_feature_name = 'HOG'
+
     result = {}
+    print('Getting Labeled Image features from Phase 1')
+    label_folder_features = helper_functions.get_main_features(label_feature_name, labelled_dataset_path)
+    metadata = Metadata(list(label_folder_features.keys()), metadatapath='Data/HandInfo.csv')
+    dorsal_images_list = metadata.get_specific_metadata_images_list({'aspectOfHand': 'dorsal'})
+    palmar_images_list = metadata.get_specific_metadata_images_list({'aspectOfHand': 'palmar'})
 
-    if classifier != 'PPR':
-        label_features = LabelFeatures(labelled_dataset_path=labelled_dataset_path,
-                                       unlabelled_dataset_path=unlabelled_dataset_path, feature_name='HOG',
-                                       decomposition_name='SVD')
-        label_features.set_features()
-        label_folder_features = helper_functions.get_main_features('LBP', labelled_dataset_path)
+    print('Getting unlabelled image features from Phase 1')
+    unlabelled_features = helper_functions.get_main_features(label_feature_name, unlabelled_dataset_path)
 
-        dorsal_features = label_features.get_label_features('dorsal')
-        palmar_features = label_features.get_label_features('palmar')
-        # unlabelled_features = label_features.get_unlabelled_images_decomposed_features()
-        unlabelled_features = helper_functions.get_main_features('LBP', unlabelled_dataset_path)
-        if classifier == 'DT':
-            decisiontree = DecisionTreeClassifier(max_depth=100)
-            dorsal_images = list(dorsal_features.keys())
-            palmar_images = list(palmar_features.keys())
-            image_list = dorsal_images
-            image_list.extend(palmar_images)
-            random.shuffle(image_list)
-            X = []
-            y = [0]*len(image_list)
+    dorsal_features = {}
+    palmar_features = {}
 
-            for i in range(0, len(image_list)):
-                image = image_list[i]
-                if image in dorsal_features:
-                    y[i] = 0
-                else:
-                    y[i] = 1
-                X.append(label_folder_features[image])
-            X = np.array(X)
-            y = np.array(y)
-            decisiontree.fit(X, y)
-            for image_id, feature in unlabelled_features.items():
-                val = decisiontree.predict([feature])
-                print(image_id, val)
-                if val[0] == 0:
-                    result[image_id] = 'dorsal'
-                else:
-                    result[image_id] = 'palmar'
+    for image in dorsal_images_list:
+        dorsal_features[image] = label_folder_features[image]
+    for image in palmar_images_list:
+        palmar_features[image] = label_folder_features[image]
 
-        elif classifier == 'SVM':
-            svm = SVM()
-            svm.generate_input_data(dorsal_features, palmar_features)
-            svm.fit(svm.dataset)
+    if classifier == 'DT':
+        decisiontree = DecisionTreeClassifier(max_depth=100)
+        dorsal_images = list(dorsal_features.keys())
+        palmar_images = list(palmar_features.keys())
+        image_list = dorsal_images
+        image_list.extend(palmar_images)
+        random.shuffle(image_list)
+        X = []
+        y = [0]*len(image_list)
 
-            for image_id, feature in unlabelled_features.items():
-                feature = list(feature)
-                val = svm.predict(feature)
-                if val.any() == 0:
-                    result[image_id] = 'dorsal'
-                elif val.any() == 1:
-                    result[image_id] = 'palmar'
-    else:
+        for i in range(0, len(image_list)):
+            image = image_list[i]
+            if image in dorsal_features:
+                y[i] = 0
+            else:
+                y[i] = 1
+            X.append(label_folder_features[image])
+        X = np.array(X)
+        y = np.array(y)
+        decisiontree.fit(X, y)
+        for image_id, feature in unlabelled_features.items():
+            val = decisiontree.predict([feature])
+            print(image_id, val)
+            if val[0] == 0:
+                result[image_id] = 'dorsal'
+            else:
+                result[image_id] = 'palmar'
+    elif classifier == 'PPR':
         unlabelled_images_list = list(helper_functions.get_images_list(unlabelled_dataset_path).keys())
         result = {}
         ppr = PageRankUtil(labelled_dataset_path, 30, 10, [])
         original_image_list = ppr.get_original_image_list()
         original_feature_map = ppr.get_original_image_feature_map()
-        decomposition = ppr.get_decomposition()
         images_dop_map = metadata.getimagesdop_dict()
         # print(images_dop_map)
         for image in tqdm(unlabelled_images_list):
-            ppr = PageRankUtil(labelled_dataset_path, 30, 10, [image], decomposition=decomposition,
-                               unlabelled_image={image: unlabelled_dataset_path}, image_list=original_image_list,
-                               feature_map=original_feature_map)
+            ppr.set_unlabeled_image({image: unlabelled_dataset_path})
+            ppr.set_set_image_list_and_feature_map(original_image_list, original_feature_map)
+            ppr.initialize()
             ppr.page_rank_util()
             page_ranking = ppr.get_page_ranking()
             dorsal_count = 0
