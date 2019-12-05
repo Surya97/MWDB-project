@@ -162,7 +162,7 @@ elif task == '4':
             X.append(label_folder_features[image])
         X = np.array(X)
         y = np.array(y)
-        svm = SVM()
+        svm = SVM(C=0.05)
         svm.fit(X, y)
         for image_id, feature in unlabelled_features.items():
             val = svm.predict([feature])
@@ -293,7 +293,10 @@ elif task == '6':
             if rorir_map[image_id] == -1:
                 feature = dataset_features[image_id]
                 val = svm.predict([feature])
-                rorir_map[image_id] = val[0]
+                if val[0] == -1:
+                    rorir_map[image_id] = 0
+                elif val[0] == 1:
+                    rorir_map[image_id] = 1
 
     elif classifier == 'PPR':
         folder_path = "data/Hands"
