@@ -1,10 +1,7 @@
-# -*- coding: utf-8 -*-
-
 import numpy as np
 from numpy import linalg
 import cvxopt
 import cvxopt.solvers
-import pandas as pd
 
 
 def linear_kernel(x1, x2):
@@ -12,91 +9,57 @@ def linear_kernel(x1, x2):
 
 
 def polynomial_kernel(x, y, p=3):
+    x = x.transpose()
     return (1 + np.dot(x, y)) ** p
 
 
 def gaussian_kernel(x, y, sigma=5.0):
-    return np.exp(-linalg.norm(x-y)**2 / (2 * (sigma ** 2)))
+    return np.exp(-linalg.norm(x - y) ** 2 / (2 * (sigma ** 2)))
 
 
 class SVM(object):
 
-    def __init__(self, kernel=linear_kernel, C=None):
+    def __init__(self, kernel=polynomial_kernel, C=None):
         self.kernel = kernel
         self.C = C
         if self.C is not None:
             self.C = float(self.C)
-        self.dataset = list()
+        self.a = None
+        self.sv = None
+        self.sv_y = None
+        self.b = 0
 
-    def generate_input_data(self, dorsal_map, palmar_map):
-        dorsalFeatures = list()
-        for im, feat in dorsal_map.items():
-            f = list()
-            feat = list(feat)
-            feat.append(0)
-            dorsalFeatures.append(feat)
-
-        palmarFeatures = list()
-
-        for im, feat in palmar_map.items():
-            f = list()
-            feat = list(feat)
-            feat.append(1)
-            palmarFeatures.append(feat)
-
-        self.dataset = dorsalFeatures
-        for i in range(len(palmarFeatures)):
-            self.dataset.append(palmarFeatures[i])
-
-        return
-
-    def fit(self, dataset):
-        dfData = pd.DataFrame(dataset)
-#        dfData = dfData.iloc[1:, :]
-        y = dfData.iloc[:, -1]
-        print(y.shape)
-        XMain = dfData.iloc[:, :-1]
-        X = XMain.iloc[:, :]
-#        X_test = XMain.iloc[250:300,:]
-        print("X & X test")
-        print(X.shape)
-#        print(X_test.shape)
-
-        X = X.to_numpy()
-        y = y.to_numpy()
-        
+    def fit(self, X, y):
         n_samples, n_features = X.shape
-
         # Gram matrix
         K = np.zeros((n_samples, n_samples))
         for i in range(n_samples):
             for j in range(n_samples):
-                K[i,j] = self.kernel(X[i], X[j])
-        P = cvxopt.matrix(np.outer(y,y) * K)
-        q = cvxopt.matrix(np.ones(n_samples) * -1)
-        A = cvxopt.matrix(y, (1,n_samples))
-        A = cvxopt.matrix(A, (1, n_samples), 'd')
+                K[i, j] = self.kernel(X[i], X[j])
+
+        P = cvxopt.matrix(np.outer(y, y) * K, tc='d')
+        q = cvxopt.matrix(np.ones(n_samples) * -1, tc='d')
+        A = cvxopt.matrix(y, (1, n_samples), 'd')
         b = cvxopt.matrix(0.0)
 
         if self.C is None:
-            G = cvxopt.matrix(np.diag(np.ones(n_samples) * -1))
+            G = cvxopt.matrix(np.diag(np.ones(n_samples) * -1), tc='d')
             h = cvxopt.matrix(np.zeros(n_samples))
         else:
             tmp1 = np.diag(np.ones(n_samples) * -1)
             tmp2 = np.identity(n_samples)
-            G = cvxopt.matrix(np.vstack((tmp1, tmp2)))
+            G = cvxopt.matrix(np.vstack((tmp1, tmp2)), tc='d')
             tmp1 = np.zeros(n_samples)
             tmp2 = np.ones(n_samples) * self.C
             h = cvxopt.matrix(np.hstack((tmp1, tmp2)))
 
-        # solve QP problem
-        solution = cvxopt.solvers.qp(P, q, G, h, A, b)
-#        print(solution['x'])
-        # Lagrange multipliers
+        solution = cvxopt.solvers.qp(P, q, G, h, A, b, kktsolver='ldl', options={'kktreg': 1e-7})
+
+        # print('Solution', solution['x'])
         a = np.ravel(solution['x'])
 
         # Support vectors have non zero lagrange multipliers
-        sv = a > 1e-5
+        sv = a > 1e-19
         ind = np.arange(len(a))[sv]
         self.a = a[sv]
         self.sv = X[sv]
@@ -107,7 +70,7 @@ class SVM(object):
         self.b = 0
         for n in range(len(self.a)):
             self.b += self.sv_y[n]
-            self.b -= np.sum(self.a * self.sv_y * K[ind[n],sv])
+            self.b -= np.sum(self.a * self.sv_y * K[ind[n], sv])
         self.b /= len(self.a)
 
         # Weight vector
@@ -117,6 +80,9 @@ class SVM(object):
                 self.w += self.a[n] * self.sv_y[n] * self.sv[n]
         else:
             self.w = None
+        # print('a', self.a)
+        # print('sv', self.sv)
+        # print('sv_y', self.sv_y)
 
     def project(self, X):
         if self.w is not None:
